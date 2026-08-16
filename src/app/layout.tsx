@@ -22,7 +22,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: {
     default: "Hohaya Trouve ta maison pour la rentrée",
-    template: "%s — Hohaya",
+    template: "%s Hohaya",
   },
   description:
     "Hohaya aide les étudiants au Bénin à trouver une maison à louer près de leur école, avec des annonces vérifiées et un paiement sécurisé.",
