@@ -99,9 +99,9 @@ export default function OwnerAbonnementPage() {
         {historique.data && historique.data.data.length > 0 ? (
           <div className="space-y-2">
             {historique.data.data.map((a) => (
-              <div key={a.id} className="flex items-center justify-between rounded-xl border p-3 text-sm">
+              <div key={a.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3 text-sm">
                 <span>{a.type_label}</span>
-                <span>{formatPrix(a.montant, a.devise)}</span>
+                <span className="text-muted-foreground">{formatPrix(a.montant, a.devise)}</span>
                 <Badge variant="secondary" className="capitalize">
                   {a.status}
                 </Badge>

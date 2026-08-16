@@ -36,8 +36,8 @@ export default function OwnerVisitesPage() {
         <div className="space-y-3">
           {visites.map((v) => (
             <div key={v.id} className="space-y-2 rounded-xl border p-4">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0">
                   <p className="font-medium">{v.property?.title ?? "Annonce"}</p>
                   <p className="text-xs text-muted-foreground">
                     {v.chercheur?.name} {v.chercheur?.phone ? `· ${v.chercheur.phone}` : ""}

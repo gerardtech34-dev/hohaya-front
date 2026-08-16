@@ -19,8 +19,8 @@ export default function ContactsPage() {
       ) : (
         <div className="space-y-3">
           {contacts.map((c) => (
-            <div key={c.id} className="flex items-center justify-between rounded-xl border p-4">
-              <div>
+            <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4">
+              <div className="min-w-0">
                 <p className="font-medium">{c.property?.title ?? "Annonce"}</p>
                 <p className="text-sm text-muted-foreground">Débloqué le {c.debloque_le}</p>
               </div>

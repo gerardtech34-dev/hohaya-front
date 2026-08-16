@@ -20,7 +20,7 @@ export default async function AnnonceDetailPage({ params }: { params: Promise<{ 
   if (!property) notFound();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
+    <div className="mx-auto max-w-[1440px] px-4 py-8 sm:py-10">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <PropertyGallery images={property.images ?? []} />

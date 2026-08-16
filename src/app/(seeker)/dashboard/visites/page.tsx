@@ -31,8 +31,8 @@ export default function VisitesPage() {
       ) : (
         <div className="space-y-3">
           {visites.map((v) => (
-            <div key={v.id} className="flex items-center justify-between rounded-xl border p-4">
-              <div>
+            <div key={v.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4">
+              <div className="min-w-0">
                 <p className="font-medium">{v.property?.title ?? "Annonce"}</p>
                 <p className="text-sm text-muted-foreground">
                   {v.date_souhaitee ?? "Date à confirmer"}

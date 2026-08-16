@@ -19,13 +19,15 @@ export default function OwnerPaiementsPage() {
       ) : (
         <div className="space-y-2">
           {data.data.map((p) => (
-            <div key={p.id} className="flex items-center justify-between rounded-xl border p-3 text-sm">
+            <div key={p.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl border p-3 text-sm">
               <span className="capitalize">{p.type}</span>
-              <span>{formatPrix(p.montant, p.devise)}</span>
+              <span className="font-medium">{formatPrix(p.montant, p.devise)}</span>
               <Badge variant="secondary" className="capitalize">
                 {p.status}
               </Badge>
-              <span className="text-muted-foreground">{new Date(p.created_at).toLocaleDateString("fr-FR")}</span>
+              <span className="ml-auto text-muted-foreground">
+                {new Date(p.created_at).toLocaleDateString("fr-FR")}
+              </span>
             </div>
           ))}
         </div>

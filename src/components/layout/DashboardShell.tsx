@@ -13,7 +13,7 @@ export function DashboardShell({
     <div className="flex min-h-screen flex-col">
       <VerifyEmailBanner />
       <Navbar />
-      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col md:flex-row">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col md:flex-row">
         <DashboardSidebar items={items} />
         <main className="flex-1 p-4 md:p-8">{children}</main>
       </div>

@@ -35,15 +35,15 @@ export default function AdminPropertiesPage() {
       ) : (
         <div className="space-y-3">
           {data.data.map((p) => (
-            <div key={p.id} className="flex items-center justify-between rounded-xl border p-4">
-              <div>
+            <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4">
+              <div className="min-w-0">
                 <p className="font-medium">{p.title}</p>
                 <p className="text-sm text-muted-foreground">
                   {formatPrix(p.prix_loyer, p.devise)} / mois · {p.ville}
                 </p>
               </div>
               <div className="flex gap-2">
-                <ButtonLink href={`/annonces/${p.id}`} variant="outline" size="sm">
+                <ButtonLink href={`/listings/${p.id}`} variant="outline" size="sm">
                   Voir l&apos;annonce
                 </ButtonLink>
                 <Button size="sm" onClick={() => verify.mutate(p.id)} disabled={verify.isPending}>

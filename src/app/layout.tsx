@@ -21,7 +21,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    default: "Hohaya — Trouve ta maison pour la rentrée",
+    default: "Hohaya Trouve ta maison pour la rentrée",
     template: "%s — Hohaya",
   },
   description:

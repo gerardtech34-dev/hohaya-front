@@ -57,13 +57,13 @@ export default function ForgotPasswordPage() {
           Indiquez votre email pour recevoir un lien de réinitialisation
         </p>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-1.5">
           <Label htmlFor="email">Email</Label>
           <Input id="email" type="email" {...register("email")} />
           <FieldError message={errors.email?.message} />
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="mt-2 w-full" disabled={loading}>
           {loading ? "Envoi..." : "Envoyer le lien"}
         </Button>
       </form>

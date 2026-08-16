@@ -52,13 +52,13 @@ export default function LoginPage() {
         <p className="text-sm text-muted-foreground">Accédez à votre espace Hohaya</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-1.5">
           <Label htmlFor="identifier">Email ou téléphone</Label>
           <Input id="identifier" {...register("identifier")} />
           <FieldError message={errors.identifier?.message} />
         </div>
-        <div>
+        <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Mot de passe</Label>
             <Link href="/forgot-password" className="text-xs text-muted-foreground underline">
@@ -68,7 +68,7 @@ export default function LoginPage() {
           <Input id="password" type="password" {...register("password")} />
           <FieldError message={errors.password?.message} />
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="mt-2 w-full" disabled={loading}>
           {loading ? "Connexion..." : "Se connecter"}
         </Button>
       </form>

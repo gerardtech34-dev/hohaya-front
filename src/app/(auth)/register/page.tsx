@@ -79,27 +79,27 @@ export default function RegisterPage() {
         <p className="text-sm text-muted-foreground">Rejoignez Hohaya en quelques secondes</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-1.5">
           <Label htmlFor="name">Nom complet</Label>
           <Input id="name" {...register("name")} />
           <FieldError message={errors.name?.message} />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div>
+          <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" {...register("email")} />
             <FieldError message={errors.email?.message} />
           </div>
-          <div>
+          <div className="space-y-1.5">
             <Label htmlFor="phone">Téléphone</Label>
             <Input id="phone" {...register("phone")} />
             <FieldError message={errors.phone?.message} />
           </div>
         </div>
 
-        <div>
+        <div className="space-y-1.5">
           <Label>Je suis</Label>
           <Select value={watch("role")} onValueChange={(v) => setValue("role", v as "owner" | "seeker")}>
             <SelectTrigger className="w-full">
@@ -113,19 +113,19 @@ export default function RegisterPage() {
           <FieldError message={errors.role?.message} />
         </div>
 
-        <div>
+        <div className="space-y-1.5">
           <Label htmlFor="password">Mot de passe</Label>
           <Input id="password" type="password" {...register("password")} />
           <FieldError message={errors.password?.message} />
         </div>
 
-        <div>
+        <div className="space-y-1.5">
           <Label htmlFor="password_confirmation">Confirmer le mot de passe</Label>
           <Input id="password_confirmation" type="password" {...register("password_confirmation")} />
           <FieldError message={errors.password_confirmation?.message} />
         </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="mt-2 w-full" disabled={loading}>
           {loading ? "Création..." : "Créer mon compte"}
         </Button>
       </form>

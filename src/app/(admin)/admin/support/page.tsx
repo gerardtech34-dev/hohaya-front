@@ -43,8 +43,8 @@ export default function AdminSupportPage() {
         <div className="space-y-3">
           {data.data.map((t) => (
             <div key={t.id} className="space-y-2 rounded-xl border p-4">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0">
                   <p className="font-medium">{t.sujet}</p>
                   <p className="text-xs text-muted-foreground">
                     {t.utilisateur?.name} · {t.categorie}

@@ -40,7 +40,7 @@ export default function FaqPage() {
         <h1 className="font-heading text-3xl font-bold sm:text-4xl">Questions fréquentes</h1>
         <p className="mt-3 text-muted-foreground">
           Vous ne trouvez pas votre réponse ?{" "}
-          <Link href="/contact" className="text-primary underline-offset-4 hover:underline">
+          <Link href="mailto:contact@hohaya.com" className="text-primary underline-offset-4 hover:underline">
             Contactez-nous
           </Link>
           .

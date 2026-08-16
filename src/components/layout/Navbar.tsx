@@ -17,10 +17,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Logo } from "@/components/layout/Logo";
 
 const NAV_LINKS = [
-  { href: "/annonces", label: "Annonces" },
-  { href: "/comment-ca-marche", label: "Comment ça marche" },
-  { href: "/tarifs", label: "Tarifs" },
-  { href: "/contact", label: "Contact" },
+  { href: "/listings", label: "Annonces" },
+  { href: "/how-it-works", label: "Comment ça marche" },
+  { href: "/pricing", label: "Tarifs" },
+  { href: "mailto:contact@hohaya.com", label: "Contact" },
 ];
 
 function dashboardHref(role: string | null) {
@@ -35,9 +35,9 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:h-20">
         <Link href="/" className="shrink-0">
-          <Logo size="sm" />
+          <Logo size="md" />
         </Link>
 
         <nav className="hidden gap-6 text-sm font-medium md:flex">
@@ -48,7 +48,7 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
           {isLoading ? null : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger

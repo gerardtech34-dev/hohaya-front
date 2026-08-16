@@ -57,18 +57,18 @@ function ResetPasswordForm() {
       <div className="space-y-1 text-center">
         <h1 className="text-xl font-semibold">Nouveau mot de passe</h1>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-1.5">
           <Label htmlFor="password">Nouveau mot de passe</Label>
           <Input id="password" type="password" {...register("password")} />
           <FieldError message={errors.password?.message} />
         </div>
-        <div>
+        <div className="space-y-1.5">
           <Label htmlFor="password_confirmation">Confirmer</Label>
           <Input id="password_confirmation" type="password" {...register("password_confirmation")} />
           <FieldError message={errors.password_confirmation?.message} />
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="mt-2 w-full" disabled={loading}>
           {loading ? "Envoi..." : "Réinitialiser"}
         </Button>
       </form>

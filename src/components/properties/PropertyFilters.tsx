@@ -12,18 +12,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const TYPES = ["studio", "appartement", "maison", "chambre", "villa", "duplex"];
 
+type FilterValues = {
+  city: string;
+  commune: string;
+  type: string;
+  min_price: string;
+  max_price: string;
+};
+
 function useFilterState() {
   const searchParams = useSearchParams();
-  return useState<Record<string, string>>({
-    ville: searchParams.get("ville") ?? "",
+  return useState<FilterValues>({
+    city: searchParams.get("city") ?? "",
     commune: searchParams.get("commune") ?? "",
-    type_logement: searchParams.get("type_logement") ?? "",
-    prix_min: searchParams.get("prix_min") ?? "",
-    prix_max: searchParams.get("prix_max") ?? "",
+    type: searchParams.get("type") ?? "",
+    min_price: searchParams.get("min_price") ?? "",
+    max_price: searchParams.get("max_price") ?? "",
   });
 }
 
@@ -31,24 +39,28 @@ function FilterFields({
   values,
   setValues,
 }: {
-  values: Record<string, string>;
-  setValues: (updater: (v: Record<string, string>) => Record<string, string>) => void;
+  values: FilterValues;
+  setValues: (updater: (v: FilterValues) => FilterValues) => void;
 }) {
   return (
     <>
-      <Input
-        placeholder="Ville"
-        value={values.ville}
-        onChange={(e) => setValues((v) => ({ ...v, ville: e.target.value }))}
-      />
-      <Input
-        placeholder="Commune"
-        value={values.commune}
-        onChange={(e) => setValues((v) => ({ ...v, commune: e.target.value }))}
-      />
+      <div>
+        <Input
+          placeholder="Ville"
+          value={values.city}
+          onChange={(e) => setValues((v) => ({ ...v, city: e.target.value }))}
+        />
+      </div>
+      <div>
+        <Input
+          placeholder="Commune"
+          value={values.commune}
+          onChange={(e) => setValues((v) => ({ ...v, commune: e.target.value }))}
+        />
+      </div>
       <Select
-        value={values.type_logement}
-        onValueChange={(v) => setValues((s) => ({ ...s, type_logement: v ?? "" }))}
+        value={values.type}
+        onValueChange={(v) => setValues((s) => ({ ...s, type: v ?? "" }))}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Type de logement" />
@@ -61,18 +73,20 @@ function FilterFields({
           ))}
         </SelectContent>
       </Select>
-      <Input
-        type="number"
-        placeholder="Prix min"
-        value={values.prix_min}
-        onChange={(e) => setValues((v) => ({ ...v, prix_min: e.target.value }))}
-      />
-      <Input
-        type="number"
-        placeholder="Prix max"
-        value={values.prix_max}
-        onChange={(e) => setValues((v) => ({ ...v, prix_max: e.target.value }))}
-      />
+      <div className="grid grid-cols-2 gap-2">
+        <Input
+          type="number"
+          placeholder="Prix min"
+          value={values.min_price}
+          onChange={(e) => setValues((v) => ({ ...v, min_price: e.target.value }))}
+        />
+        <Input
+          type="number"
+          placeholder="Prix max"
+          value={values.max_price}
+          onChange={(e) => setValues((v) => ({ ...v, max_price: e.target.value }))}
+        />
+      </div>
     </>
   );
 }
@@ -88,38 +102,25 @@ export function PropertyFilters() {
       if (v) params.set(k, v);
     });
     setOpen(false);
-    router.push(`/annonces?${params.toString()}`);
+    router.push(`/listings?${params.toString()}`);
   };
 
   return (
-    <>
-      {/* Desktop : filtres en ligne */}
-      <div className="hidden rounded-2xl border border-border bg-card p-4 md:grid md:grid-cols-6 md:gap-3">
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        render={
+          <Button variant="outline" className="gap-2 rounded-full">
+            <SlidersHorizontal size={16} />
+            Filtres
+          </Button>
+        }
+      />
+      <PopoverContent align="end" className="w-[min(20rem,calc(100vw-2rem))] space-y-3 p-4">
         <FilterFields values={values} setValues={setValues} />
-        <Button onClick={submit}>Rechercher</Button>
-      </div>
-
-      {/* Mobile : bouton qui ouvre un tiroir de filtres */}
-      <div className="md:hidden">
-        <Button variant="outline" className="w-full gap-2" onClick={() => setOpen(true)}>
-          <SlidersHorizontal size={16} />
-          Filtrer les annonces
+        <Button onClick={submit} className="w-full">
+          Voir les résultats
         </Button>
-      </div>
-
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="md:hidden">
-          <SheetHeader>
-            <SheetTitle>Filtrer les annonces</SheetTitle>
-          </SheetHeader>
-          <div className="space-y-3 px-4 pb-4">
-            <FilterFields values={values} setValues={setValues} />
-            <Button onClick={submit} className="w-full">
-              Voir les résultats
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
-    </>
+      </PopoverContent>
+    </Popover>
   );
 }
