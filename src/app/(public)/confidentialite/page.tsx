@@ -24,7 +24,7 @@ export default function ConfidentialitePage() {
         <section>
           <h2 className="mb-1 font-heading font-semibold text-foreground">Paiement</h2>
           <p>
-            Les paiements sont traités par KKiaPay. Hohaya ne stocke aucune donnée bancaire ou
+            Les paiements sont traités par FedaPay. Hohaya ne stocke aucune donnée bancaire ou
             Mobile Money — seules les références de transaction sont conservées pour le suivi des
             paiements.
           </p>

@@ -25,7 +25,7 @@ export default function CguPage() {
           <h2 className="mb-1 font-heading font-semibold text-foreground">3. Paiements et abonnements</h2>
           <p>
             La publication d&apos;annonces nécessite un abonnement actif. Le déblocage du contact
-            d&apos;un propriétaire par un chercheur est un service payant, réglé via KKiaPay. Les
+            d&apos;un propriétaire par un chercheur est un service payant, réglé via FedaPay. Les
             paiements confirmés ne sont pas remboursables, sauf erreur technique avérée.
           </p>
         </section>

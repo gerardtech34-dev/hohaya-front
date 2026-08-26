@@ -6,11 +6,11 @@ export const metadata = { title: "FAQ" };
 const FAQ_CHERCHEUR = [
   {
     q: "Comment débloquer le contact d'un propriétaire ?",
-    a: "Depuis la page d'une annonce vérifiée, cliquez sur « Débloquer le contact du propriétaire » puis réglez le montant indiqué via Mobile Money (KKiaPay). Vous obtenez immédiatement le nom et le numéro de téléphone du propriétaire.",
+    a: "Depuis la page d'une annonce vérifiée, cliquez sur « Contacter propriétaire » puis réglez le montant indiqué via Mobile Money (FedaPay). Vous obtenez immédiatement le nom et le numéro de téléphone du propriétaire.",
   },
   {
     q: "Le paiement est-il sécurisé ?",
-    a: "Oui, tous les paiements passent par KKiaPay, une passerelle de paiement Mobile Money sécurisée. Hohaya ne stocke jamais vos informations de paiement.",
+    a: "Oui, tous les paiements passent par FedaPay, une passerelle de paiement Mobile Money sécurisée. Hohaya ne stocke jamais vos informations de paiement.",
   },
   {
     q: "Que faire si une annonce me semble suspecte ?",

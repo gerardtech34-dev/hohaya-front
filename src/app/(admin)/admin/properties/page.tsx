@@ -5,9 +5,10 @@ import { toast } from "sonner";
 import * as adminApi from "@/lib/api/admin";
 import * as propertiesApi from "@/lib/api/properties";
 import { formatPrix } from "@/lib/format";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingState } from "@/components/ui/loading-state";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Button } from "@/components/ui/button";
+import { Building2 } from "lucide-react";
 
 export default function AdminPropertiesPage() {
   const queryClient = useQueryClient();
@@ -27,15 +28,18 @@ export default function AdminPropertiesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Annonces en attente de vérification</h1>
+      <h1 className="font-heading text-2xl font-bold">Annonces en attente de vérification</h1>
       {isLoading ? (
-        <Skeleton className="h-40 w-full rounded-xl" />
+        <LoadingState />
       ) : !data || data.data.length === 0 ? (
-        <p className="text-muted-foreground">Aucune annonce en attente.</p>
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border p-8 text-center">
+          <Building2 className="text-muted-foreground" size={28} />
+          <p className="text-sm text-muted-foreground">Aucune annonce en attente.</p>
+        </div>
       ) : (
         <div className="space-y-3">
           {data.data.map((p) => (
-            <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4">
+            <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
               <div className="min-w-0">
                 <p className="font-medium">{p.title}</p>
                 <p className="text-sm text-muted-foreground">

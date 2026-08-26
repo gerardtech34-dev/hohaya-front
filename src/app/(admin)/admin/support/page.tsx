@@ -7,8 +7,9 @@ import * as adminApi from "@/lib/api/admin";
 import * as supportApi from "@/lib/api/support";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingState } from "@/components/ui/loading-state";
 import { Textarea } from "@/components/ui/textarea";
+import { Headset } from "lucide-react";
 
 export default function AdminSupportPage() {
   const queryClient = useQueryClient();
@@ -30,19 +31,23 @@ export default function AdminSupportPage() {
       toast.success("Ticket fermé.");
       queryClient.invalidateQueries({ queryKey: ["admin-support"] });
     },
+    onError: () => toast.error("Impossible de fermer ce ticket."),
   });
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Support</h1>
+      <h1 className="font-heading text-2xl font-bold">Support</h1>
       {isLoading ? (
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <LoadingState />
       ) : !data || data.data.length === 0 ? (
-        <p className="text-muted-foreground">Aucun ticket.</p>
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border p-8 text-center">
+          <Headset className="text-muted-foreground" size={28} />
+          <p className="text-sm text-muted-foreground">Aucun ticket.</p>
+        </div>
       ) : (
         <div className="space-y-3">
           {data.data.map((t) => (
-            <div key={t.id} className="space-y-2 rounded-xl border p-4">
+            <div key={t.id} className="space-y-2 rounded-2xl border border-border bg-card p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-medium">{t.sujet}</p>

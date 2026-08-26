@@ -85,14 +85,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    try {
-      await authApi.logout();
-    } catch {
-      // token already invalid, ignore
-    }
     clearToken();
     setUser(null);
     router.push("/login");
+    authApi.logout().catch(() => {
+      // token already invalid, ignore
+    });
   };
 
   const role = user ? extractRole(user) : null;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, LayoutDashboard, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -63,8 +63,16 @@ export function Navbar() {
                 }
               />
               <DropdownMenuContent align="end">
-                <DropdownMenuItem render={<Link href={dashboardHref(role)}>Mon espace</Link>} />
-                <DropdownMenuItem onClick={() => logout()}>Déconnexion</DropdownMenuItem>
+                <DropdownMenuItem
+                  render={
+                    <Link href={dashboardHref(role)}>
+                      <LayoutDashboard size={16} /> Mon espace
+                    </Link>
+                  }
+                />
+                <DropdownMenuItem onClick={() => logout()} variant="destructive">
+                  <LogOut size={16} /> Déconnexion
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -99,17 +107,18 @@ export function Navbar() {
             <div className="mt-auto flex flex-col gap-2 border-t border-border p-4">
               {isLoading ? null : user ? (
                 <>
-                  <ButtonLink href={dashboardHref(role)} onClick={() => setOpen(false)}>
-                    Mon espace
+                  <ButtonLink href={dashboardHref(role)} onClick={() => setOpen(false)} className="gap-2">
+                    <LayoutDashboard size={16} /> Mon espace
                   </ButtonLink>
                   <Button
                     variant="outline"
+                    className="gap-2"
                     onClick={() => {
                       setOpen(false);
                       logout();
                     }}
                   >
-                    Déconnexion
+                    <LogOut size={16} /> Déconnexion
                   </Button>
                 </>
               ) : (
@@ -128,12 +137,12 @@ export function Navbar() {
 
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-lg"
           className="md:hidden"
           onClick={() => setOpen(true)}
           aria-label="Ouvrir le menu"
         >
-          <Menu />
+          <Menu size={46} />
         </Button>
       </div>
     </header>

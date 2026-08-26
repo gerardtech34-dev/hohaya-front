@@ -15,6 +15,14 @@ export function uploadAvatar(file: File) {
   return apiFetch<User>("/user/avatar", { method: "POST", body: form, isFormData: true });
 }
 
+export function updatePassword(payload: {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}) {
+  return apiFetch<null>("/user/password", { method: "PUT", body: payload });
+}
+
 export function deleteAvatar() {
   return apiFetch<null>("/user/avatar", { method: "DELETE" });
 }

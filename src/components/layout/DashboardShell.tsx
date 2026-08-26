@@ -1,5 +1,4 @@
-import { Navbar } from "@/components/layout/Navbar";
-import { VerifyEmailBanner } from "@/components/layout/VerifyEmailBanner";
+import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { DashboardSidebar, type DashboardNavItem } from "@/components/layout/DashboardSidebar";
 
 export function DashboardShell({
@@ -9,12 +8,14 @@ export function DashboardShell({
   items: DashboardNavItem[];
   children: React.ReactNode;
 }) {
+  const profileItem = items.find((i) => i.href.endsWith("/profile"));
+  const homeHref = items[0]?.href ?? "/";
+
   return (
-    <div className="flex min-h-screen flex-col">
-      <VerifyEmailBanner />
-      <Navbar />
-      <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col md:flex-row">
-        <DashboardSidebar items={items} />
+    <div className="flex min-h-screen">
+      <DashboardSidebar items={items} homeHref={homeHref} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <DashboardHeader items={items} homeHref={homeHref} profileHref={profileItem?.href} />
         <main className="flex-1 p-4 md:p-8">{children}</main>
       </div>
     </div>

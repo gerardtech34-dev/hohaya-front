@@ -1,12 +1,21 @@
 import { apiDownload, apiFetch } from "@/lib/api/client";
 import type { AdminTarifAbonnement, AdminUser, Paginated, Paiement, Property, Signalement, SupportTicket } from "@/lib/types";
 
+export type AdminDashboardStats = {
+  users: { total: number; proprietaires: number; chercheurs: number; nouveaux_30j: number; verifies: number };
+  properties: { total: number; disponibles: number; verifiees: number; en_attente: number; nouvelles_30j: number };
+  abonnements: { actifs: number; expires_7j: number };
+  revenus: { total: number; ce_mois: number; mois_dernier: number };
+  support: { ouverts: number; en_cours: number };
+  paiements: { en_attente: number; echoues_7j: number };
+};
+
 export function dashboard() {
-  return apiFetch<Record<string, number>>("/admin/dashboard");
+  return apiFetch<AdminDashboardStats>("/admin/dashboard");
 }
 
 export function revenusMensuels() {
-  return apiFetch<{ mois: string; total: number }[]>("/admin/revenus/mensuel");
+  return apiFetch<{ mois: string; montant: number }[]>("/admin/revenus/mensuel");
 }
 
 export function users(params: { page?: number; search?: string } = {}) {
@@ -63,6 +72,17 @@ export function updateTarif(
   payload: { montant?: number; description?: string; is_actif?: boolean }
 ) {
   return apiFetch<AdminTarifAbonnement>(`/admin/tarifs/${type}`, { method: "PATCH", body: payload });
+}
+
+export function settings() {
+  return apiFetch<{ deblocage_contact_prix: number }>("/admin/settings");
+}
+
+export function updateDeblocagePrix(montant: number) {
+  return apiFetch<{ deblocage_contact_prix: number }>("/admin/settings/deblocage-prix", {
+    method: "PATCH",
+    body: { montant },
+  });
 }
 
 function downloadBlob(blob: Blob, filename: string) {

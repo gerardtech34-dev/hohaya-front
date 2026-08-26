@@ -6,8 +6,16 @@ import { toast } from "sonner";
 import * as ownerVisitesApi from "@/lib/api/owner-visites";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingState } from "@/components/ui/loading-state";
 import { Textarea } from "@/components/ui/textarea";
+import { CalendarX2 } from "lucide-react";
+
+const STATUS_STYLES: Record<string, string> = {
+  en_attente: "border-accent/40 bg-accent/10 text-accent-foreground",
+  confirmée: "border-secondary/40 bg-secondary/10 text-secondary",
+  refusée: "border-destructive/40 bg-destructive/10 text-destructive",
+  annulée: "border-border bg-muted text-muted-foreground",
+};
 
 export default function OwnerVisitesPage() {
   const queryClient = useQueryClient();
@@ -27,15 +35,18 @@ export default function OwnerVisitesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Visites reçues</h1>
+      <h1 className="font-heading text-2xl font-bold">Visites reçues</h1>
       {isLoading ? (
-        <Skeleton className="h-40 w-full rounded-xl" />
+        <LoadingState />
       ) : visites.length === 0 ? (
-        <p className="text-muted-foreground">Aucune demande de visite pour le moment.</p>
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border p-8 text-center">
+          <CalendarX2 className="text-muted-foreground" size={28} />
+          <p className="text-sm text-muted-foreground">Aucune demande de visite pour le moment.</p>
+        </div>
       ) : (
         <div className="space-y-3">
           {visites.map((v) => (
-            <div key={v.id} className="space-y-2 rounded-xl border p-4">
+            <div key={v.id} className="space-y-2 rounded-2xl border border-border bg-card p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-medium">{v.property?.title ?? "Annonce"}</p>
@@ -43,7 +54,7 @@ export default function OwnerVisitesPage() {
                     {v.chercheur?.name} {v.chercheur?.phone ? `· ${v.chercheur.phone}` : ""}
                   </p>
                 </div>
-                <Badge variant="secondary" className="capitalize">
+                <Badge className={`capitalize ${STATUS_STYLES[v.status] ?? ""}`} variant="outline">
                   {v.status}
                 </Badge>
               </div>

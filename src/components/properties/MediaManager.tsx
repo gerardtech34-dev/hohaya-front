@@ -6,8 +6,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as mediaApi from "@/lib/api/property-media";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingState } from "@/components/ui/loading-state";
+import { ConfirmDialog, useConfirmDialog } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/utils";
+import { Trash2, Image as ImageIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -64,12 +66,16 @@ export function MediaManager({ propertyId }: { propertyId: number }) {
     onError: () => toast.error("Échec de l'upload."),
   });
 
+  const confirm = useConfirmDialog();
+
   const remove = useMutation({
     mutationFn: (mediaId: number) => mediaApi.remove(propertyId, mediaId),
     onSuccess: () => {
       toast.success("Média supprimé.");
       invalidate();
+      confirm.close();
     },
+    onError: () => toast.error("Impossible de supprimer ce média."),
   });
 
   const setPrincipal = useMutation({
@@ -78,11 +84,13 @@ export function MediaManager({ propertyId }: { propertyId: number }) {
       toast.success("Image principale définie.");
       invalidate();
     },
+    onError: () => toast.error("Impossible de définir cette image comme principale."),
   });
 
   const moveMedia = useMutation({
     mutationFn: (orderedIds: number[]) => mediaApi.reorder(propertyId, orderedIds),
     onSuccess: invalidate,
+    onError: () => toast.error("Impossible de réordonner les médias."),
   });
 
   const medias = data ?? [];
@@ -96,9 +104,9 @@ export function MediaManager({ propertyId }: { propertyId: number }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 rounded-2xl border border-border bg-card p-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-medium">Photos & vidéos</h2>
+        <h2 className="font-heading font-semibold">Photos &amp; vidéos</h2>
         <Button size="sm" onClick={() => fileRef.current?.click()}>
           Ajouter un média
         </Button>
@@ -144,9 +152,12 @@ export function MediaManager({ propertyId }: { propertyId: number }) {
       </Dialog>
 
       {isLoading ? (
-        <Skeleton className="h-32 w-full rounded-xl" />
+        <LoadingState />
       ) : medias.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucun média pour le moment.</p>
+        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border p-6 text-center">
+          <ImageIcon className="text-muted-foreground" size={24} />
+          <p className="text-sm text-muted-foreground">Aucun média pour le moment.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {medias.map((m, idx) => (
@@ -180,14 +191,28 @@ export function MediaManager({ propertyId }: { propertyId: number }) {
                     Principale
                   </Button>
                 )}
-                <Button size="xs" variant="destructive" onClick={() => remove.mutate(m.id)}>
-                  ✕
-                </Button>
+                <button
+                  type="button"
+                  aria-label="Supprimer ce média"
+                  onClick={() => confirm.ask(m.id)}
+                  className="flex h-6 w-6 items-center justify-center rounded-full text-destructive transition hover:bg-destructive/10"
+                >
+                  <Trash2 size={13} />
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirm.target !== null}
+        onOpenChange={(open) => !open && confirm.close()}
+        title="Supprimer ce média ?"
+        description="Cette action est irréversible."
+        loading={remove.isPending}
+        onConfirm={() => confirm.target && remove.mutate(confirm.target)}
+      />
     </div>
   );
 }

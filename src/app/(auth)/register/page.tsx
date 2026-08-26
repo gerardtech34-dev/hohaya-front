@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { handleApiError } from "@/lib/api/apply-errors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field-error";
 import {
@@ -115,13 +116,13 @@ export default function RegisterPage() {
 
         <div className="space-y-1.5">
           <Label htmlFor="password">Mot de passe</Label>
-          <Input id="password" type="password" {...register("password")} />
+          <PasswordInput id="password" {...register("password")} />
           <FieldError message={errors.password?.message} />
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="password_confirmation">Confirmer le mot de passe</Label>
-          <Input id="password_confirmation" type="password" {...register("password_confirmation")} />
+          <PasswordInput id="password_confirmation" {...register("password_confirmation")} />
           <FieldError message={errors.password_confirmation?.message} />
         </div>
 

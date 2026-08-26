@@ -109,9 +109,9 @@ export function PropertyFilters() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
-          <Button variant="outline" className="gap-2 rounded-full">
+          <Button variant="outline" className="shrink-0 gap-2 rounded-full">
             <SlidersHorizontal size={16} />
-            Filtres
+            <span className="hidden sm:inline">Filtres</span>
           </Button>
         }
       />

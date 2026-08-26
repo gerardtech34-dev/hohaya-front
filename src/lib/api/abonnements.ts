@@ -6,7 +6,7 @@ export type InitierAbonnementResult = {
   paiement_id: number;
   montant: number;
   devise: string;
-  kkiapay_public_key: string;
+  fedapay_public_key: string;
   sandbox: boolean;
   instructions: string;
 };

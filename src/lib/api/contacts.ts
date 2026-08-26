@@ -7,7 +7,7 @@ export type ContactPaymentIntent = {
   devise: string;
   property_id: number;
   property_title: string;
-  kkiapay_public_key: string;
+  fedapay_public_key: string;
   sandbox: boolean;
   instructions: string;
 };
@@ -29,8 +29,22 @@ export function initier(propertyId: number) {
   });
 }
 
+export type GuestInitierResult = InitierContactResult & {
+  access_token: string;
+  refresh_token: string;
+};
+
+export function guestInitier(payload: { property_id: number; name: string; email: string; phone: string }) {
+  return apiFetch<GuestInitierResult>("/contacts/guest-initier", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export type ConfirmerContactResult = ContactInfo | { pending: true; message: string };
+
 export function confirmer(payload: { paiement_id: number; transaction_id: string }) {
-  return apiFetch<ContactInfo>("/contacts/confirmer", { method: "POST", body: payload });
+  return apiFetch<ConfirmerContactResult>("/contacts/confirmer", { method: "POST", body: payload });
 }
 
 export function historique() {

@@ -100,7 +100,7 @@ export type Paiement = {
   status: string;
   montant: number;
   devise: string;
-  kkiapay_transaction_id: string | null;
+  fedapay_transaction_id: string | null;
   telephone_paiement: string | null;
   operateur: string | null;
   paye_le: string | null;

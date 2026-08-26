@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { resetPassword } from "@/lib/api/auth";
 import { handleApiError } from "@/lib/api/apply-errors";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field-error";
 
@@ -60,12 +60,12 @@ function ResetPasswordForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="space-y-1.5">
           <Label htmlFor="password">Nouveau mot de passe</Label>
-          <Input id="password" type="password" {...register("password")} />
+          <PasswordInput id="password" {...register("password")} />
           <FieldError message={errors.password?.message} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password_confirmation">Confirmer</Label>
-          <Input id="password_confirmation" type="password" {...register("password_confirmation")} />
+          <PasswordInput id="password_confirmation" {...register("password_confirmation")} />
           <FieldError message={errors.password_confirmation?.message} />
         </div>
         <Button type="submit" className="mt-2 w-full" disabled={loading}>

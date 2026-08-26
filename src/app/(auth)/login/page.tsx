@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { handleApiError } from "@/lib/api/apply-errors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field-error";
 
@@ -65,7 +66,7 @@ export default function LoginPage() {
               Mot de passe oublié ?
             </Link>
           </div>
-          <Input id="password" type="password" {...register("password")} />
+          <PasswordInput id="password" {...register("password")} />
           <FieldError message={errors.password?.message} />
         </div>
         <Button type="submit" className="mt-2 w-full" disabled={loading}>

@@ -13,7 +13,8 @@ export default async function HomePage() {
       <section className="bg-gradient-to-b from-muted/50 to-background px-4 pb-10 pt-12 sm:pt-16">
         <div className="mx-auto max-w-3xl space-y-5 text-center">
           <h1 className="font-heading text-3xl font-bold leading-tight text-balance sm:text-4xl lg:text-5xl">
-            Trouve <span className="text-primary">une maison à louer</span> pour ta rentrée
+            Trouve <span className="text-primary">une maison</span>{" "}
+            <span className="text-shine font-extrabold">vérifiée</span> à louer pour ta rentrée
           </h1>
           <div className="mx-auto max-w-2xl text-left">
             <HeroSearch />
