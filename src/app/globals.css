@@ -52,6 +52,13 @@
   z-index: 20 !important;
 }
 
+/* Les toasts sont des contrôles d'UI, pas du contenu — un clic dessus ne doit
+   jamais déclencher une sélection de texte sur la page en dessous. */
+[data-sonner-toaster],
+[data-sonner-toaster] * {
+  user-select: none;
+}
+
 /* N'afficher que le toast le plus récent — jamais l'aperçu coloré des toasts empilés derrière */
 [data-sonner-toast][data-front="false"] {
   display: none !important;
