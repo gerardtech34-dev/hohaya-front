@@ -143,6 +143,61 @@ function DeblocagePrixEditor() {
   );
 }
 
+function DeblocagePartHohayaEditor() {
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({ queryKey: ["admin-settings"], queryFn: adminApi.settings });
+  const [pourcentage, setPourcentage] = useState("");
+
+  const save = useMutation({
+    mutationFn: () => adminApi.updateDeblocagePartHohaya(Number(pourcentage)),
+    onSuccess: (res) => {
+      toast.success("Répartition mise à jour.");
+      setPourcentage(String(res.deblocage_part_hohaya_pourcentage));
+      queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
+    },
+    onError: () => toast.error("Impossible de mettre à jour la répartition."),
+  });
+
+  const current = data?.deblocage_part_hohaya_pourcentage ?? 50;
+
+  return (
+    <div className="space-y-4 rounded-2xl border border-border bg-card p-5">
+      <div>
+        <h2 className="flex items-center gap-2 font-heading font-semibold">
+          <KeyRound size={17} className="text-primary" />
+          Répartition du paiement de déblocage
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          Part (%) du montant de déblocage de contact qui revient à Hohaya — le reste revient au propriétaire.
+        </p>
+      </div>
+
+      {isLoading ? (
+        <LoadingState />
+      ) : (
+        <div className="space-y-1.5">
+          <Label htmlFor="deblocage-part-hohaya">Part Hohaya (%)</Label>
+          <Input
+            id="deblocage-part-hohaya"
+            type="number"
+            min={0}
+            max={100}
+            value={pourcentage || String(current)}
+            onChange={(e) => setPourcentage(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Actuel : {current}% Hohaya / {100 - current}% propriétaire
+          </p>
+        </div>
+      )}
+
+      <Button onClick={() => save.mutate()} disabled={save.isPending || isLoading}>
+        {save.isPending ? "Enregistrement..." : "Enregistrer"}
+      </Button>
+    </div>
+  );
+}
+
 export default function AdminTarifsPage() {
   const { data, isLoading } = useQuery({ queryKey: ["admin-tarifs"], queryFn: adminApi.tarifsAdmin });
 
@@ -173,6 +228,7 @@ export default function AdminTarifsPage() {
         <h2 className="mb-3 font-heading font-semibold">Contacts chercheurs</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <DeblocagePrixEditor />
+          <DeblocagePartHohayaEditor />
         </div>
       </div>
     </div>

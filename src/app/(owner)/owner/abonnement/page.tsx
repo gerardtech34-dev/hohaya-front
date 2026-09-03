@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Check, CalendarClock } from "lucide-react";
+import { useAuth } from "@/lib/auth/AuthContext";
 import * as abonnementsApi from "@/lib/api/abonnements";
 import { formatPrix } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ const INCLUS = [
 const POPULAIRE = "trimestriel";
 
 export default function OwnerAbonnementPage() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const tarifs = useQuery({ queryKey: ["tarifs"], queryFn: abonnementsApi.tarifs });
   const actif = useQuery({ queryKey: ["abonnement-actif"], queryFn: abonnementsApi.actif });
@@ -101,6 +103,13 @@ export default function OwnerAbonnementPage() {
                       publicKey={intent.fedapay_public_key}
                       sandbox={intent.sandbox}
                       label="Payer maintenant"
+                      autoOpen
+                      customer={{
+                        firstname: user?.name?.split(" ")[0] || undefined,
+                        lastname: user?.name?.split(" ").slice(1).join(" ") || undefined,
+                        email: user?.email || undefined,
+                        phone: user?.phone || undefined,
+                      }}
                       onSuccess={async (transactionId) => {
                         try {
                           await abonnementsApi.confirmer({

@@ -48,7 +48,10 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const TYPES = ["studio", "appartement", "maison", "chambre", "villa", "duplex"];
+// v1 recentrée "logement étudiant" : uniquement "chambre à louer" pour l'instant.
+// Studio/maison/appartement/villa/duplex mis en standby, pas supprimés — réactiver ici si le scope s'élargit.
+const TYPES = ["chambre"];
+// const TYPES_HORS_SCOPE_V1 = ["studio", "maison", "appartement", "villa", "duplex"];
 
 const CHECKBOXES: { key: keyof FormValues; label: string }[] = [
   { key: "eau_courante", label: "Eau courante" },

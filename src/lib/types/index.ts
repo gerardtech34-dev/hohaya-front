@@ -12,6 +12,7 @@ export type User = {
   is_suscribed: boolean | null;
   subscription_end: string | null;
   email_verified_at: string | null;
+  two_factor_enabled?: boolean;
   roles?: string[];
   created_at: string;
 };
@@ -99,6 +100,8 @@ export type Paiement = {
   type: string;
   status: string;
   montant: number;
+  part_hohaya: number | null;
+  part_proprietaire: number | null;
   devise: string;
   fedapay_transaction_id: string | null;
   telephone_paiement: string | null;
@@ -106,6 +109,7 @@ export type Paiement = {
   paye_le: string | null;
   created_at: string;
   user?: { id: number; name: string; email: string | null } | null;
+  property?: { id: number; title: string } | null;
 };
 
 export type Favori = {

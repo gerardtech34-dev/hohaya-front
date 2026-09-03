@@ -2,6 +2,7 @@ import { apiFetch } from "@/lib/api/client";
 import type { Paginated, Property } from "@/lib/types";
 
 export type PropertyFilters = {
+  pays?: string;
   ville?: string;
   commune?: string;
   quartier?: string;

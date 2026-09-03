@@ -5,7 +5,13 @@ export type AdminDashboardStats = {
   users: { total: number; proprietaires: number; chercheurs: number; nouveaux_30j: number; verifies: number };
   properties: { total: number; disponibles: number; verifiees: number; en_attente: number; nouvelles_30j: number };
   abonnements: { actifs: number; expires_7j: number };
-  revenus: { total: number; ce_mois: number; mois_dernier: number };
+  revenus: {
+    total: number;
+    ce_mois: number;
+    mois_dernier: number;
+    part_hohaya_total: number;
+    part_proprietaires_total: number;
+  };
   support: { ouverts: number; en_cours: number };
   paiements: { en_attente: number; echoues_7j: number };
 };
@@ -44,6 +50,10 @@ export function annoncesEnAttente() {
   return apiFetch<Paginated<Property>>("/admin/properties/pending");
 }
 
+export function toutesLesAnnonces(page = 1) {
+  return apiFetch<Paginated<Property>>("/admin/properties", { params: { page } });
+}
+
 export function paiements(page = 1) {
   return apiFetch<Paginated<Paiement>>("/admin/paiements", { params: { page } });
 }
@@ -75,7 +85,9 @@ export function updateTarif(
 }
 
 export function settings() {
-  return apiFetch<{ deblocage_contact_prix: number }>("/admin/settings");
+  return apiFetch<{ deblocage_contact_prix: number; deblocage_part_hohaya_pourcentage: number }>(
+    "/admin/settings"
+  );
 }
 
 export function updateDeblocagePrix(montant: number) {
@@ -83,6 +95,13 @@ export function updateDeblocagePrix(montant: number) {
     method: "PATCH",
     body: { montant },
   });
+}
+
+export function updateDeblocagePartHohaya(pourcentage: number) {
+  return apiFetch<{ deblocage_part_hohaya_pourcentage: number }>(
+    "/admin/settings/deblocage-part-hohaya",
+    { method: "PATCH", body: { pourcentage } }
+  );
 }
 
 function downloadBlob(blob: Blob, filename: string) {

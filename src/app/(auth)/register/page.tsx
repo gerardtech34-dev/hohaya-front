@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,23 +26,32 @@ const schema = z
     name: z.string().min(2, "Le nom est requis"),
     email: z.string().email("Email invalide").optional().or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
-    password: z.string().min(8, "8 caractères minimum"),
-    password_confirmation: z.string(),
+    password: z.string().optional().or(z.literal("")),
+    password_confirmation: z.string().optional().or(z.literal("")),
     role: z.enum(["owner", "seeker"], { message: "Choisissez un profil" }),
-  })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "Les mots de passe ne correspondent pas",
-    path: ["password_confirmation"],
   })
   .refine((data) => data.email || data.phone, {
     message: "Email ou téléphone requis",
     path: ["email"],
+  })
+  .refine((data) => data.role !== "seeker" || !!data.email, {
+    message: "Un email est requis pour recevoir votre code de connexion",
+    path: ["email"],
+  })
+  .refine((data) => data.role !== "owner" || (data.password?.length ?? 0) >= 8, {
+    message: "8 caractères minimum",
+    path: ["password"],
+  })
+  .refine((data) => data.role !== "owner" || data.password === data.password_confirmation, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["password_confirmation"],
   });
 
 type FormValues = z.infer<typeof schema>;
 
 export default function RegisterPage() {
   const { register: registerUser } = useAuth();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const {
     register,
@@ -55,17 +65,26 @@ export default function RegisterPage() {
     defaultValues: { role: "seeker" },
   });
 
+  const role = watch("role");
+  const isSeeker = role === "seeker";
+
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
     try {
-      await registerUser({
+      const result = await registerUser({
         name: values.name,
         email: values.email || undefined,
         phone: values.phone || undefined,
-        password: values.password,
-        password_confirmation: values.password_confirmation,
+        password: isSeeker ? undefined : values.password,
+        password_confirmation: isSeeker ? undefined : values.password_confirmation,
         role: values.role,
       });
+
+      if ("requires_login_code" in result) {
+        router.push(`/login?mode=code&email=${encodeURIComponent(result.email ?? "")}`);
+      } else {
+        router.push(`/register/verifiez-votre-email?email=${encodeURIComponent(result.email ?? "")}`);
+      }
     } catch (error) {
       handleApiError(error, setError);
     } finally {
@@ -104,27 +123,39 @@ export default function RegisterPage() {
           <Label>Je suis</Label>
           <Select value={watch("role")} onValueChange={(v) => setValue("role", v as "owner" | "seeker")}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Choisir un profil" />
+              <SelectValue placeholder="Choisir un profil">
+                {(value: string) =>
+                  value === "seeker"
+                    ? "Chercheur de logement"
+                    : value === "owner"
+                      ? "Propriétaire"
+                      : "Choisir un profil"
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="seeker">À la recherche d&apos;un logement</SelectItem>
-              <SelectItem value="owner">Propriétaire / bailleur</SelectItem>
+              <SelectItem value="seeker">Chercheur de logement</SelectItem>
+              <SelectItem value="owner">Propriétaire</SelectItem>
             </SelectContent>
           </Select>
           <FieldError message={errors.role?.message} />
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="password">Mot de passe</Label>
-          <PasswordInput id="password" {...register("password")} />
-          <FieldError message={errors.password?.message} />
-        </div>
+        {isSeeker ? null : (
+          <>
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Mot de passe</Label>
+              <PasswordInput id="password" {...register("password")} />
+              <FieldError message={errors.password?.message} />
+            </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="password_confirmation">Confirmer le mot de passe</Label>
-          <PasswordInput id="password_confirmation" {...register("password_confirmation")} />
-          <FieldError message={errors.password_confirmation?.message} />
-        </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="password_confirmation">Confirmer le mot de passe</Label>
+              <PasswordInput id="password_confirmation" {...register("password_confirmation")} />
+              <FieldError message={errors.password_confirmation?.message} />
+            </div>
+          </>
+        )}
 
         <Button type="submit" className="mt-2 w-full" disabled={loading}>
           {loading ? "Création..." : "Créer mon compte"}

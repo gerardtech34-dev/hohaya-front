@@ -59,9 +59,6 @@ export function FedaPayButton({
         : undefined,
       onComplete: async (...args: unknown[]) => {
         try {
-          // eslint-disable-next-line no-console
-          console.log("[FedaPay] onComplete", args);
-
           // La forme exacte de ce callback varie selon les versions de Checkout.js
           // (reason, transaction) ou ({ reason, transaction }) — on cherche l'id
           // de transaction où qu'il se trouve plutôt que de dépendre d'une forme précise.

@@ -7,8 +7,8 @@ import * as propertiesApi from "@/lib/api/properties";
 export const metadata = { title: "Annonces" };
 
 type SearchParams = {
+  country?: string;
   city?: string;
-  commune?: string;
   district?: string;
   type?: string;
   min_price?: string;
@@ -24,8 +24,8 @@ export default async function ListingsPage({
   const params = await searchParams;
   const result = await propertiesApi
     .list({
+      pays: params.country,
       ville: params.city,
-      commune: params.commune,
       quartier: params.district,
       type_logement: params.type,
       prix_min: params.min_price ? Number(params.min_price) : undefined,

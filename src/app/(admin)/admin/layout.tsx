@@ -1,6 +1,6 @@
 "use client";
 
-import { Gauge, Users, Users2, Building2, Wallet, Tag, Headset, Flag } from "lucide-react";
+import { Gauge, Users, Users2, Building2, Wallet, Tag, Headset, Flag, ShieldCheck } from "lucide-react";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 
 const items = [
@@ -12,6 +12,7 @@ const items = [
   { href: "/admin/tarifs", label: "Tarifs", icon: Tag },
   { href: "/admin/support", label: "Support", icon: Headset },
   { href: "/admin/signalements", label: "Signalements", icon: Flag },
+  { href: "/admin/securite", label: "Sécurité", icon: ShieldCheck },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

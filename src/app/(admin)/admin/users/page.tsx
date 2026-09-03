@@ -12,6 +12,17 @@ import { ConfirmDialog, useConfirmDialog } from "@/components/ui/confirm-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, ShieldCheck, ShieldOff, Trash2, RotateCcw, Search } from "lucide-react";
 
+const ROLE_LABELS: Record<string, string> = {
+  seeker: "Chercheur",
+  owner: "Propriétaire",
+  admin: "Administrateur",
+};
+
+function roleLabel(role?: string) {
+  if (!role) return "—";
+  return ROLE_LABELS[role] ?? role;
+}
+
 export default function AdminUsersPage() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -105,7 +116,7 @@ export default function AdminUsersPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{u.email ?? u.phone}</TableCell>
-                  <TableCell className="capitalize">{u.roles?.[0] ?? "—"}</TableCell>
+                  <TableCell>{roleLabel(u.roles?.[0])}</TableCell>
                   <TableCell>
                     {u.deleted_at ? (
                       <Badge variant="destructive">Suspendu</Badge>

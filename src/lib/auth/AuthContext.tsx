@@ -6,19 +6,24 @@ import * as authApi from "@/lib/api/auth";
 import { clearToken, getToken, setRole, setTokens } from "@/lib/auth/token";
 import type { Role, User } from "@/lib/types";
 
+type LoginOutcome = { status: "authenticated"; user: User } | { status: "two_factor_required"; userId: number };
+
 type AuthContextValue = {
   user: User | null;
   role: Role | null;
   isLoading: boolean;
-  login: (payload: { email?: string; phone?: string; password: string }) => Promise<User>;
+  login: (payload: { email?: string; phone?: string; password: string }) => Promise<LoginOutcome>;
+  completeTwoFactor: (userId: number, code: string) => Promise<User>;
+  loginByCode: (email: string, code: string) => Promise<User>;
+  applyAuthResult: (result: authApi.AuthResult) => User;
   register: (payload: {
     name: string;
     email?: string;
     phone?: string;
-    password: string;
-    password_confirmation: string;
+    password?: string;
+    password_confirmation?: string;
     role: "owner" | "seeker";
-  }) => Promise<User>;
+  }) => Promise<authApi.RegisterResult>;
   logout: () => Promise<void>;
   refreshMe: () => Promise<void>;
 };
@@ -64,8 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshMe();
   }, []);
 
-  const login: AuthContextValue["login"] = async (payload) => {
-    const result = await authApi.login(payload);
+  const applyAuthResult = (result: authApi.AuthResult) => {
     setTokens(result.access_token, result.refresh_token);
     const role = extractRole(result.user);
     if (role) setRole(role);
@@ -74,14 +78,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return result.user;
   };
 
+  const login: AuthContextValue["login"] = async (payload) => {
+    const result = await authApi.login(payload);
+    if ("two_factor_required" in result) {
+      return { status: "two_factor_required", userId: result.user_id };
+    }
+    const user = applyAuthResult(result);
+    return { status: "authenticated", user };
+  };
+
+  const completeTwoFactor: AuthContextValue["completeTwoFactor"] = async (userId, code) => {
+    const result = await authApi.verifyTwoFactor(userId, code);
+    return applyAuthResult(result);
+  };
+
+  const loginByCode: AuthContextValue["loginByCode"] = async (email, code) => {
+    const result = await authApi.verifyLoginCode(email, code);
+    return applyAuthResult(result);
+  };
+
   const register: AuthContextValue["register"] = async (payload) => {
-    const result = await authApi.register(payload);
-    setTokens(result.access_token, result.refresh_token);
-    const role = extractRole(result.user);
-    if (role) setRole(role);
-    setUser(result.user);
-    router.push(redirectForRole(role));
-    return result.user;
+    return authApi.register(payload);
   };
 
   const logout = async () => {
@@ -96,7 +113,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const role = user ? extractRole(user) : null;
 
   return (
-    <AuthContext.Provider value={{ user, role, isLoading, login, register, logout, refreshMe }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        role,
+        isLoading,
+        login,
+        completeTwoFactor,
+        loginByCode,
+        applyAuthResult,
+        register,
+        logout,
+        refreshMe,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

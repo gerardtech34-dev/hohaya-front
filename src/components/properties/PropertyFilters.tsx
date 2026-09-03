@@ -14,11 +14,13 @@ import {
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-const TYPES = ["studio", "appartement", "maison", "chambre", "villa", "duplex"];
+// v1 recentrée "logement étudiant" : cf. PropertyForm.tsx pour le detail du standby.
+const TYPES = ["chambre"];
 
 type FilterValues = {
+  country: string;
   city: string;
-  commune: string;
+  district: string;
   type: string;
   min_price: string;
   max_price: string;
@@ -27,8 +29,9 @@ type FilterValues = {
 function useFilterState() {
   const searchParams = useSearchParams();
   return useState<FilterValues>({
+    country: searchParams.get("country") ?? "",
     city: searchParams.get("city") ?? "",
-    commune: searchParams.get("commune") ?? "",
+    district: searchParams.get("district") ?? "",
     type: searchParams.get("type") ?? "",
     min_price: searchParams.get("min_price") ?? "",
     max_price: searchParams.get("max_price") ?? "",
@@ -46,6 +49,13 @@ function FilterFields({
     <>
       <div>
         <Input
+          placeholder="Pays"
+          value={values.country}
+          onChange={(e) => setValues((v) => ({ ...v, country: e.target.value }))}
+        />
+      </div>
+      <div>
+        <Input
           placeholder="Ville"
           value={values.city}
           onChange={(e) => setValues((v) => ({ ...v, city: e.target.value }))}
@@ -53,9 +63,9 @@ function FilterFields({
       </div>
       <div>
         <Input
-          placeholder="Commune"
-          value={values.commune}
-          onChange={(e) => setValues((v) => ({ ...v, commune: e.target.value }))}
+          placeholder="Quartier"
+          value={values.district}
+          onChange={(e) => setValues((v) => ({ ...v, district: e.target.value }))}
         />
       </div>
       <Select

@@ -9,19 +9,52 @@ export type AuthResult = {
   user: User;
 };
 
+export type RegisterResult =
+  | { requires_login_code: true; email: string | null }
+  | { requires_email_verification: true; email: string | null };
+
 export function register(payload: {
   name: string;
   email?: string;
   phone?: string;
-  password: string;
-  password_confirmation: string;
+  password?: string;
+  password_confirmation?: string;
   role: "owner" | "seeker";
 }) {
-  return apiFetch<AuthResult>("/auth/register", { method: "POST", body: payload, auth: false });
+  return apiFetch<RegisterResult>("/auth/register", { method: "POST", body: payload, auth: false });
 }
 
+export type LoginResult = AuthResult | { two_factor_required: true; user_id: number };
+
 export function login(payload: { email?: string; phone?: string; password: string }) {
-  return apiFetch<AuthResult>("/auth/login", { method: "POST", body: payload, auth: false });
+  return apiFetch<LoginResult>("/auth/login", { method: "POST", body: payload, auth: false });
+}
+
+export function requestLoginCode(email: string) {
+  return apiFetch<null>("/auth/login-code/request", { method: "POST", body: { email }, auth: false });
+}
+
+export function verifyLoginCode(email: string, code: string) {
+  return apiFetch<AuthResult>("/auth/login-code/verify", {
+    method: "POST",
+    body: { email, code },
+    auth: false,
+  });
+}
+
+export function verifyTwoFactor(userId: number, code: string) {
+  return apiFetch<AuthResult>("/auth/2fa/verify", {
+    method: "POST",
+    body: { user_id: userId, code },
+    auth: false,
+  });
+}
+
+export function updateTwoFactorSetting(enabled: boolean) {
+  return apiFetch<{ two_factor_enabled: boolean }>("/user/settings/2fa", {
+    method: "PATCH",
+    body: { enabled },
+  });
 }
 
 export function forgotPassword(payload: { email: string }) {
@@ -38,7 +71,7 @@ export function resetPassword(payload: {
 }
 
 export function verifyEmail(id: string, hash: string, params: string) {
-  return apiFetch<null>(`/auth/verify-email/${id}/${hash}${params}`, { auth: false });
+  return apiFetch<AuthResult>(`/auth/verify-email/${id}/${hash}${params}`, { auth: false });
 }
 
 export function me() {

@@ -51,6 +51,8 @@ const DETAIL_SECTIONS: {
       { label: "Expirent sous 7j", get: (d) => d.abonnements.expires_7j },
       { label: "Revenus totaux", get: (d) => formatPrix(d.revenus.total) },
       { label: "Revenus mois dernier", get: (d) => formatPrix(d.revenus.mois_dernier) },
+      { label: "Part Hohaya (déblocages contacts)", get: (d) => formatPrix(d.revenus.part_hohaya_total) },
+      { label: "Part propriétaires (déblocages contacts)", get: (d) => formatPrix(d.revenus.part_proprietaires_total) },
     ],
   },
   {
