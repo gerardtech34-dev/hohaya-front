@@ -58,9 +58,11 @@ export default function OwnerVisitesPage() {
                   {v.status}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">Souhaitée le {v.date_souhaitee}</p>
+              <p className="text-sm text-muted-foreground">
+                {v.proposee_par === "proprietaire" ? "Date proposée par vous" : "Souhaitée"} le {v.date_souhaitee}
+              </p>
               {v.message && <p className="text-sm text-muted-foreground">&ldquo;{v.message}&rdquo;</p>}
-              {v.status === "en_attente" && (
+              {v.status === "en_attente" && v.proposee_par === "chercheur" && (
                 <div className="space-y-2">
                   <Textarea
                     placeholder="Note (horaire proposé, message...)"

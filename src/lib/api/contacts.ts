@@ -14,8 +14,10 @@ export type ContactPaymentIntent = {
 
 export type ContactInfo = {
   access: true;
+  nouveau: boolean;
   property_id: number;
   property_title: string;
+  lien_maps: string | null;
   proprietaire: { nom: string; telephone: string | null; email: string | null };
   message: string;
 };

@@ -28,9 +28,9 @@ const schema = z.object({
   description: z.string().min(10, "Description trop courte"),
   indications_acces: z.string().optional(),
   quartier: z.string().optional(),
-  commune: z.string().optional(),
   ville: z.string().min(2, "Ville requise"),
   pays: z.string().optional(),
+  lien_maps: z.string().url("Lien invalide").optional().or(z.literal("")),
   prix_loyer: z.number().positive("Prix invalide"),
   devise: z.string().min(1),
   type_logement: z.string().min(1, "Type requis"),
@@ -80,9 +80,9 @@ export function PropertyForm({ property }: { property?: Property }) {
           description: property.description,
           indications_acces: property.indications_acces ?? "",
           quartier: property.quartier ?? "",
-          commune: property.commune ?? "",
           ville: property.ville ?? "",
           pays: property.pays ?? "",
+          lien_maps: property.lien_maps ?? "",
           prix_loyer: property.prix_loyer,
           devise: property.devise ?? "XOF",
           type_logement: property.type_logement,
@@ -99,6 +99,7 @@ export function PropertyForm({ property }: { property?: Property }) {
         }
       : {
           devise: "XOF",
+          type_logement: TYPES[0],
           nb_avance: 1,
           nb_pieces: 1,
           caution_electricite: 0,
@@ -161,13 +162,18 @@ export function PropertyForm({ property }: { property?: Property }) {
             <FieldError message={errors.ville?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="commune">Commune</Label>
-            <Input id="commune" {...register("commune")} />
-          </div>
-          <div className="space-y-1.5">
             <Label htmlFor="quartier">Quartier</Label>
             <Input id="quartier" {...register("quartier")} />
           </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="lien_maps">Lien Google Maps (optionnel)</Label>
+          <Input
+            id="lien_maps"
+            placeholder="https://maps.app.goo.gl/..."
+            {...register("lien_maps")}
+          />
+          <FieldError message={errors.lien_maps?.message} />
         </div>
       </div>
 

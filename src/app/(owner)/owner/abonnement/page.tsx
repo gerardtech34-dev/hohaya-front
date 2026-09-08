@@ -54,7 +54,7 @@ export default function OwnerAbonnementPage() {
           <LoadingState />
         ) : actif.data ? (
           <div className="flex flex-wrap items-center gap-3">
-            <Badge>{actif.data.type_label}</Badge>
+            <Badge>Durée : {actif.data.type_label}</Badge>
             <span className="text-sm text-muted-foreground">
               Expire le {actif.data.date_fin} ({actif.data.jours_restants} jours restants)
             </span>

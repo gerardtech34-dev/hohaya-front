@@ -9,7 +9,7 @@ import { formatPrix } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, MapPin } from "lucide-react";
 import { FedaPayButton } from "@/components/payments/FedaPayButton";
 import {
   Dialog,
@@ -100,9 +100,21 @@ export function ReserveButton({ propertyId, compact = false }: { propertyId: num
 
   if (confirmed) {
     return (
-      <div className="flex items-start gap-2 rounded-2xl border border-secondary/40 bg-secondary/10 p-3 text-sm">
-        <CheckCircle2 className="mt-0.5 shrink-0 text-secondary" size={18} />
-        <p>{confirmed.message}</p>
+      <div className="space-y-2 rounded-2xl border border-secondary/40 bg-secondary/10 p-3 text-sm">
+        <div className="flex items-start gap-2">
+          <CheckCircle2 className="mt-0.5 shrink-0 text-secondary" size={18} />
+          <p>{confirmed.message}</p>
+        </div>
+        {confirmed.lien_maps && (
+          <a
+            href={confirmed.lien_maps}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-6 flex w-fit items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition hover:bg-primary/20"
+          >
+            <MapPin size={12} /> Voir sur Google Maps
+          </a>
+        )}
       </div>
     );
   }
@@ -170,7 +182,12 @@ export function ReserveButton({ propertyId, compact = false }: { propertyId: num
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="reserve-guest-phone">Téléphone</Label>
-            <Input id="reserve-guest-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <Input
+              id="reserve-guest-phone"
+              placeholder="+2290197000000"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
         </div>
         <DialogFooter>

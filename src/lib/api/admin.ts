@@ -85,9 +85,12 @@ export function updateTarif(
 }
 
 export function settings() {
-  return apiFetch<{ deblocage_contact_prix: number; deblocage_part_hohaya_pourcentage: number }>(
-    "/admin/settings"
-  );
+  return apiFetch<{
+    deblocage_contact_prix: number;
+    deblocage_part_hohaya_pourcentage: number;
+    deblocage_essais_gratuits: number;
+    abonnement_requis: boolean;
+  }>("/admin/settings");
 }
 
 export function updateDeblocagePrix(montant: number) {
@@ -101,6 +104,20 @@ export function updateDeblocagePartHohaya(pourcentage: number) {
   return apiFetch<{ deblocage_part_hohaya_pourcentage: number }>(
     "/admin/settings/deblocage-part-hohaya",
     { method: "PATCH", body: { pourcentage } }
+  );
+}
+
+export function updateDeblocageEssaisGratuits(nombre: number) {
+  return apiFetch<{ deblocage_essais_gratuits: number }>(
+    "/admin/settings/deblocage-essais-gratuits",
+    { method: "PATCH", body: { nombre } }
+  );
+}
+
+export function updateAbonnementRequis(requis: boolean) {
+  return apiFetch<{ abonnement_requis: boolean }>(
+    "/admin/settings/abonnement-requis",
+    { method: "PATCH", body: { requis } }
   );
 }
 

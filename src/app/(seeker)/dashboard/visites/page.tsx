@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CalendarX2 } from "lucide-react";
-import { annulerVisite, mesVisites } from "@/lib/api/chercheur";
+import { annulerVisite, mesVisites, repondreVisite } from "@/lib/api/chercheur";
 import type { Visite } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,15 @@ export default function VisitesPage() {
     onError: () => toast.error("Impossible d'annuler cette visite."),
   });
 
+  const respond = useMutation({
+    mutationFn: ({ id, status }: { id: number; status: "confirmée" | "refusée" }) => repondreVisite(id, status),
+    onSuccess: () => {
+      toast.success("Réponse envoyée.");
+      queryClient.invalidateQueries({ queryKey: ["visites"] });
+    },
+    onError: () => toast.error("Impossible d'envoyer la réponse."),
+  });
+
   return (
     <div className="space-y-6">
       <h1 className="font-heading text-2xl font-bold">Mes visites</h1>
@@ -71,6 +80,9 @@ export default function VisitesPage() {
                   {v.property?.title ?? "Annonce"}
                 </Link>
                 <p className="text-sm text-muted-foreground">{v.date_souhaitee ?? "Date à confirmer"}</p>
+                {v.proposee_par === "proprietaire" && v.status === "en_attente" && (
+                  <p className="mt-1 text-sm text-primary">Le propriétaire propose cette date.</p>
+                )}
                 {v.note_proprietaire && (
                   <p className="mt-1 text-sm text-muted-foreground">
                     Réponse du propriétaire : {v.note_proprietaire}
@@ -81,10 +93,30 @@ export default function VisitesPage() {
                 <Badge className={`capitalize ${STATUS_STYLES[v.status] ?? ""}`} variant="outline">
                   {STATUS_LABELS[v.status] ?? v.status}
                 </Badge>
-                {v.status === "en_attente" && (
-                  <Button size="sm" variant="outline" onClick={() => setToCancel(v)}>
-                    Annuler
-                  </Button>
+                {v.status === "en_attente" && v.proposee_par === "proprietaire" ? (
+                  <>
+                    <Button
+                      size="sm"
+                      onClick={() => respond.mutate({ id: v.id, status: "confirmée" })}
+                      disabled={respond.isPending}
+                    >
+                      Confirmer
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => respond.mutate({ id: v.id, status: "refusée" })}
+                      disabled={respond.isPending}
+                    >
+                      Refuser
+                    </Button>
+                  </>
+                ) : (
+                  v.status === "en_attente" && (
+                    <Button size="sm" variant="outline" onClick={() => setToCancel(v)}>
+                      Annuler
+                    </Button>
+                  )
                 )}
               </div>
             </div>

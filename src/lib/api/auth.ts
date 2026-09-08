@@ -9,16 +9,14 @@ export type AuthResult = {
   user: User;
 };
 
-export type RegisterResult =
-  | { requires_login_code: true; email: string | null }
-  | { requires_email_verification: true; email: string | null };
+export type RegisterResult = { requires_email_verification: true; email: string | null };
 
 export function register(payload: {
   name: string;
   email?: string;
   phone?: string;
-  password?: string;
-  password_confirmation?: string;
+  password: string;
+  password_confirmation: string;
   role: "owner" | "seeker";
 }) {
   return apiFetch<RegisterResult>("/auth/register", { method: "POST", body: payload, auth: false });
@@ -70,8 +68,8 @@ export function resetPassword(payload: {
   return apiFetch<null>("/auth/reset-password", { method: "POST", body: payload, auth: false });
 }
 
-export function verifyEmail(id: string, hash: string, params: string) {
-  return apiFetch<AuthResult>(`/auth/verify-email/${id}/${hash}${params}`, { auth: false });
+export function verifyEmail(token: string) {
+  return apiFetch<AuthResult>("/auth/verify-email", { method: "POST", body: { token }, auth: false });
 }
 
 export function me() {

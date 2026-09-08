@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -53,6 +53,14 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(startInCodeVerify ? 30 : 0);
+  const [resending, setResending] = useState(false);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => setResendCooldown((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   const passwordForm = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
   const emailForm = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) });
@@ -86,6 +94,20 @@ function LoginForm() {
       handleApiError(error, emailForm.setError);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onResendCode = async () => {
+    if (step.mode !== "code_verify" || resendCooldown > 0) return;
+    setResending(true);
+    try {
+      await authApi.requestLoginCode(step.email);
+      toast.success("Nouveau code envoyé !");
+      setResendCooldown(30);
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setResending(false);
     }
   };
 
@@ -125,6 +147,20 @@ function LoginForm() {
         <Button onClick={onVerifyOtp} className="w-full" disabled={loading}>
           {loading ? "Vérification..." : "Valider"}
         </Button>
+        {step.mode === "code_verify" && (
+          <button
+            type="button"
+            onClick={onResendCode}
+            disabled={resendCooldown > 0 || resending}
+            className="w-full text-center text-sm text-muted-foreground underline disabled:no-underline disabled:opacity-60"
+          >
+            {resending
+              ? "Envoi..."
+              : resendCooldown > 0
+                ? `Renvoyer le code (${resendCooldown}s)`
+                : "Renvoyer le code"}
+          </button>
+        )}
         <button
           type="button"
           onClick={() => setStep({ mode: "password" })}

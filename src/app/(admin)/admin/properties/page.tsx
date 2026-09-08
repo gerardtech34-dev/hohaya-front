@@ -40,7 +40,7 @@ function PropertyAdminCard({
           </div>
         )}
         <div className="absolute left-2 top-2">
-          <Badge variant={p.is_verified ? "secondary" : "outline"} className="bg-card shadow-sm">
+          <Badge variant={p.is_verified ? "secondary" : "outline"} className="shadow-sm">
             {p.is_verified ? "Publiée" : "Suspendue"}
           </Badge>
         </div>

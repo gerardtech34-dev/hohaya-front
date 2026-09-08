@@ -6,7 +6,20 @@ import * as ownerRevenusApi from "@/lib/api/owner-revenus";
 import { formatPrix } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { LoadingState } from "@/components/ui/loading-state";
+import { ButtonLink } from "@/components/ui/button-link";
 import { Wallet, Coins } from "lucide-react";
+
+const STATUS_LABELS: Record<string, string> = {
+  en_attente: "En attente",
+  succès: "Réussi",
+  échoué: "Échoué",
+};
+
+const STATUS_VARIANTS: Record<string, "secondary" | "outline" | "destructive"> = {
+  en_attente: "outline",
+  succès: "secondary",
+  échoué: "destructive",
+};
 
 function MesGains() {
   const { data, isLoading } = useQuery({
@@ -68,15 +81,27 @@ export default function OwnerPaiementsPage() {
         ) : (
           <div className="space-y-2">
             {data.data.map((p) => (
-              <div key={p.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl border border-border bg-card p-3 text-sm">
-                <span className="capitalize">{p.type}</span>
-                <span className="font-medium">{formatPrix(p.montant, p.devise)}</span>
-                <Badge variant="secondary" className="capitalize">
-                  {p.status}
-                </Badge>
-                <span className="ml-auto text-muted-foreground">
-                  {new Date(p.created_at).toLocaleDateString("fr-FR")}
-                </span>
+              <div key={p.id} className="rounded-2xl border border-border bg-card p-3 text-sm">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <span className="capitalize">{p.type}</span>
+                  <span className="font-medium">{formatPrix(p.montant, p.devise)}</span>
+                  <Badge variant={STATUS_VARIANTS[p.status] ?? "secondary"}>
+                    {STATUS_LABELS[p.status] ?? p.status}
+                  </Badge>
+                  <span className="text-muted-foreground">
+                    {new Date(p.created_at).toLocaleDateString("fr-FR")}
+                  </span>
+                  {p.status === "échoué" && (
+                    <ButtonLink href="/owner/abonnement" size="sm" variant="outline" className="ml-auto">
+                      Réessayer
+                    </ButtonLink>
+                  )}
+                </div>
+                {p.status === "succès" && p.fedapay_transaction_id && (
+                  <p className="mt-1.5 text-xs text-muted-foreground">
+                    Reçu envoyé par FedaPay à votre email · Transaction #{p.fedapay_transaction_id}
+                  </p>
+                )}
               </div>
             ))}
           </div>

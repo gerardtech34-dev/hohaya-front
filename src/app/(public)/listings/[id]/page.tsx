@@ -37,7 +37,7 @@ export default async function AnnonceDetailPage({ params }: { params: Promise<{ 
           <div>
             <h1 className="font-heading text-2xl font-bold">{property.title}</h1>
             <p className="text-muted-foreground">
-              {[property.quartier, property.commune, property.ville, property.pays].filter(Boolean).join(", ")}
+              {[property.quartier, property.ville, property.pays].filter(Boolean).join(", ")}
             </p>
           </div>
 

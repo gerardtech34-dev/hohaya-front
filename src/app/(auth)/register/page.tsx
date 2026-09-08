@@ -26,8 +26,8 @@ const schema = z
     name: z.string().min(2, "Le nom est requis"),
     email: z.string().email("Email invalide").optional().or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
-    password: z.string().optional().or(z.literal("")),
-    password_confirmation: z.string().optional().or(z.literal("")),
+    password: z.string().min(8, "8 caractères minimum"),
+    password_confirmation: z.string(),
     role: z.enum(["owner", "seeker"], { message: "Choisissez un profil" }),
   })
   .refine((data) => data.email || data.phone, {
@@ -35,14 +35,10 @@ const schema = z
     path: ["email"],
   })
   .refine((data) => data.role !== "seeker" || !!data.email, {
-    message: "Un email est requis pour recevoir votre code de connexion",
+    message: "Un email est requis pour recevoir votre code de vérification",
     path: ["email"],
   })
-  .refine((data) => data.role !== "owner" || (data.password?.length ?? 0) >= 8, {
-    message: "8 caractères minimum",
-    path: ["password"],
-  })
-  .refine((data) => data.role !== "owner" || data.password === data.password_confirmation, {
+  .refine((data) => data.password === data.password_confirmation, {
     message: "Les mots de passe ne correspondent pas",
     path: ["password_confirmation"],
   });
@@ -65,9 +61,6 @@ export default function RegisterPage() {
     defaultValues: { role: "seeker" },
   });
 
-  const role = watch("role");
-  const isSeeker = role === "seeker";
-
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
     try {
@@ -75,16 +68,12 @@ export default function RegisterPage() {
         name: values.name,
         email: values.email || undefined,
         phone: values.phone || undefined,
-        password: isSeeker ? undefined : values.password,
-        password_confirmation: isSeeker ? undefined : values.password_confirmation,
+        password: values.password,
+        password_confirmation: values.password_confirmation,
         role: values.role,
       });
 
-      if ("requires_login_code" in result) {
-        router.push(`/login?mode=code&email=${encodeURIComponent(result.email ?? "")}`);
-      } else {
-        router.push(`/register/verifiez-votre-email?email=${encodeURIComponent(result.email ?? "")}`);
-      }
+      router.push(`/register/verifiez-votre-email?email=${encodeURIComponent(result.email ?? "")}`);
     } catch (error) {
       handleApiError(error, setError);
     } finally {
@@ -114,7 +103,7 @@ export default function RegisterPage() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="phone">Téléphone</Label>
-            <Input id="phone" {...register("phone")} />
+            <Input id="phone" placeholder="+2290197000000" {...register("phone")} />
             <FieldError message={errors.phone?.message} />
           </div>
         </div>
@@ -141,21 +130,17 @@ export default function RegisterPage() {
           <FieldError message={errors.role?.message} />
         </div>
 
-        {isSeeker ? null : (
-          <>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Mot de passe</Label>
-              <PasswordInput id="password" {...register("password")} />
-              <FieldError message={errors.password?.message} />
-            </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="password">Mot de passe</Label>
+          <PasswordInput id="password" {...register("password")} />
+          <FieldError message={errors.password?.message} />
+        </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password_confirmation">Confirmer le mot de passe</Label>
-              <PasswordInput id="password_confirmation" {...register("password_confirmation")} />
-              <FieldError message={errors.password_confirmation?.message} />
-            </div>
-          </>
-        )}
+        <div className="space-y-1.5">
+          <Label htmlFor="password_confirmation">Confirmer le mot de passe</Label>
+          <PasswordInput id="password_confirmation" {...register("password_confirmation")} />
+          <FieldError message={errors.password_confirmation?.message} />
+        </div>
 
         <Button type="submit" className="mt-2 w-full" disabled={loading}>
           {loading ? "Création..." : "Créer mon compte"}

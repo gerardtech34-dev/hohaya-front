@@ -4,7 +4,6 @@ import type { Paginated, Property } from "@/lib/types";
 export type PropertyFilters = {
   pays?: string;
   ville?: string;
-  commune?: string;
   quartier?: string;
   type_logement?: string;
   prix_min?: number;

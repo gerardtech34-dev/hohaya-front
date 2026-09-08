@@ -35,8 +35,8 @@ export type Property = {
   title: string;
   description: string;
   indications_acces: string | null;
+  lien_maps: string | null;
   quartier: string | null;
-  commune: string | null;
   ville: string | null;
   pays: string | null;
   prix_loyer: number;
@@ -121,6 +121,7 @@ export type Favori = {
 export type Visite = {
   id: number;
   status: string;
+  proposee_par: "chercheur" | "proprietaire";
   date_souhaitee: string | null;
   message: string | null;
   note_proprietaire: string | null;

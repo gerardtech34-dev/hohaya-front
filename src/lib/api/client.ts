@@ -125,7 +125,12 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
     throw new ApiError(message, res.status, errors);
   }
 
-  return (json?.data ?? (json as unknown)) as T;
+  // "data" peut légitimement valoir null (ex: pas d'abonnement actif) — ne retomber sur
+  // l'enveloppe complète que si la clé "data" est absente, pas si elle vaut null.
+  if (json && typeof json === "object" && "data" in json) {
+    return json.data as T;
+  }
+  return json as T;
 }
 
 export async function apiDownload(path: string): Promise<Blob> {

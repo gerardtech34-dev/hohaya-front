@@ -133,7 +133,7 @@ export function ProfileForm() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="phone">Téléphone</Label>
-              <Input id="phone" {...register("phone")} />
+              <Input id="phone" placeholder="+2290197000000" {...register("phone")} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="adress">Adresse</Label>

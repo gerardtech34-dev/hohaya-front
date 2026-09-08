@@ -22,3 +22,7 @@ export function mesVisites() {
 export function annulerVisite(id: number) {
   return apiFetch<Visite>(`/chercheur/visites/${id}/annuler`, { method: "PATCH" });
 }
+
+export function repondreVisite(id: number, status: "confirmée" | "refusée") {
+  return apiFetch<Visite>(`/chercheur/visites/${id}/repondre`, { method: "PATCH", body: { status } });
+}

@@ -15,6 +15,7 @@ export type ReservationPaymentIntent = {
 export type ReservationConfirmed = {
   property_id: number;
   property_title: string;
+  lien_maps: string | null;
   message: string;
 };
 

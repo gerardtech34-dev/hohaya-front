@@ -20,8 +20,8 @@ type AuthContextValue = {
     name: string;
     email?: string;
     phone?: string;
-    password?: string;
-    password_confirmation?: string;
+    password: string;
+    password_confirmation: string;
     role: "owner" | "seeker";
   }) => Promise<authApi.RegisterResult>;
   logout: () => Promise<void>;

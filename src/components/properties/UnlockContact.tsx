@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, Phone, Mail, Copy, PhoneCall, Loader2 } from "lucide-react";
+import { CheckCircle2, Phone, Mail, Copy, PhoneCall, Loader2, MapPin } from "lucide-react";
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
 import { useAuth } from "@/lib/auth/AuthContext";
 import * as contactsApi from "@/lib/api/contacts";
@@ -46,6 +46,12 @@ export function UnlockContact({ propertyId, compact = false }: { propertyId: num
   const applyResult = (res: contactsApi.InitierContactResult) => {
     if ("access" in res && res.access) {
       setContact(res);
+      // Déblocage gratuit (essai offert ou prix à 0) : le contact est débloqué immédiatement
+      // sans paiement FedaPay, donc le popup de succès n'est jamais déclenché ailleurs.
+      if (res.nouveau) {
+        setSuccessOpen(true);
+        toast.success("Contact débloqué !");
+      }
     } else {
       setPayment(res as contactsApi.ContactPaymentIntent);
     }
@@ -146,6 +152,16 @@ export function UnlockContact({ propertyId, compact = false }: { propertyId: num
             </div>
           )}
           {contact.proprietaire.email && <p className="text-muted-foreground">{contact.proprietaire.email}</p>}
+          {contact.lien_maps && (
+            <a
+              href={contact.lien_maps}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-fit items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition hover:bg-primary/20"
+            >
+              <MapPin size={12} /> Voir sur Google Maps
+            </a>
+          )}
         </div>
 
         <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
@@ -197,6 +213,16 @@ export function UnlockContact({ propertyId, compact = false }: { propertyId: num
                 <p className="flex items-center justify-center gap-2 text-muted-foreground">
                   <Mail size={14} /> {contact.proprietaire.email}
                 </p>
+              )}
+              {contact.lien_maps && (
+                <a
+                  href={contact.lien_maps}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 font-medium text-primary hover:underline"
+                >
+                  <MapPin size={14} /> Voir sur Google Maps
+                </a>
               )}
             </div>
             <p className="text-center text-xs text-muted-foreground">
@@ -273,7 +299,12 @@ export function UnlockContact({ propertyId, compact = false }: { propertyId: num
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="guest-phone">Téléphone</Label>
-            <Input id="guest-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <Input
+              id="guest-phone"
+              placeholder="+2290197000000"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
         </div>
         <DialogFooter>
