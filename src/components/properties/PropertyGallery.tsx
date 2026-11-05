@@ -6,8 +6,22 @@ import { Home, X, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import type { PropertyMedia } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
+function proxyVideoUrl(url: string): string {
+  // Passe les vidéos via le proxy Next.js pour supporter les range requests
+  try {
+    const u = new URL(url);
+    if (u.pathname.startsWith("/storage/")) {
+      return `/api/storage${u.pathname.replace("/storage", "")}`;
+    }
+  } catch {}
+  return url;
+}
+
 export function PropertyGallery({ images = [], videos = [] }: { images?: PropertyMedia[]; videos?: PropertyMedia[] }) {
-  const media = [...images, ...videos];
+  const media = [
+    ...images.map((i) => ({ ...i, type: "image" as const })),
+    ...videos.map((v) => ({ ...v, type: "video" as const, url: proxyVideoUrl(v.url) })),
+  ];
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState(false);
 
@@ -44,7 +58,7 @@ export function PropertyGallery({ images = [], videos = [] }: { images?: Propert
         className="relative block aspect-video w-full cursor-zoom-in overflow-hidden rounded-2xl bg-muted"
       >
         {current.type === "video" ? (
-          <video src={current.url} className="h-full w-full object-cover" muted playsInline />
+          <video src={current.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
         ) : (
           <Image src={current.url} alt="" fill className="object-cover" unoptimized />
         )}
@@ -70,7 +84,7 @@ export function PropertyGallery({ images = [], videos = [] }: { images?: Propert
             >
               {m.type === "video" ? (
                 <>
-                  <video src={m.url} className="h-full w-full object-cover" muted playsInline />
+                  <video src={m.url} className="h-full w-full object-cover" muted playsInline preload="metadata" />
                   <span className="absolute inset-0 flex items-center justify-center bg-black/30">
                     <Play size={16} className="fill-white text-white" />
                   </span>

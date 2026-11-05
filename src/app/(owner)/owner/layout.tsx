@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Building2, CalendarCheck, Users2, Wallet, Headset, UserCog, Contact } from "lucide-react";
+import { Home, Building2, CalendarCheck, Users2, Headset, UserCog, Contact } from "lucide-react";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 
 // Module "Abonnement" mis en veille (2026-09) : lien retiré de la nav, pages/API conservées
@@ -11,7 +11,7 @@ const items = [
   { href: "/owner/contacts", label: "Chercheurs intéressés", icon: Contact },
   { href: "/owner/visites", label: "Visites reçues", icon: CalendarCheck },
   { href: "/owner/locataires", label: "Locataires", icon: Users2 },
-  { href: "/owner/paiements", label: "Paiements", icon: Wallet },
+  // "Paiements" masqué tant que l'abonnement proprio est désactivé (2026-11)
   { href: "/owner/support", label: "Support", icon: Headset },
   { href: "/owner/profile", label: "Profil", icon: UserCog },
 ];

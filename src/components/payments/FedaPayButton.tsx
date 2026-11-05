@@ -61,25 +61,39 @@ export function FedaPayButton({
         try {
           // La forme exacte de ce callback varie selon les versions de Checkout.js
           // (reason, transaction) ou ({ reason, transaction }) — on cherche l'id
-          // de transaction où qu'il se trouve plutôt que de dépendre d'une forme précise.
+          // de transaction et le statut où qu'ils se trouvent.
           let transactionId: string | undefined;
+          let transactionStatus: string | undefined;
+
           for (const arg of args) {
             if (arg && typeof arg === "object") {
               const obj = arg as Record<string, unknown>;
-              if (obj.id !== undefined) {
-                transactionId = String(obj.id);
-                break;
-              }
+              // Forme { transaction: { id, status } }
               const nested = obj.transaction as Record<string, unknown> | undefined;
               if (nested?.id !== undefined) {
                 transactionId = String(nested.id);
+                transactionStatus = nested.status as string | undefined;
+                break;
+              }
+              // Forme { id, status }
+              if (obj.id !== undefined) {
+                transactionId = String(obj.id);
+                transactionStatus = obj.status as string | undefined;
                 break;
               }
             }
           }
 
-          if (transactionId) {
+          // N'appeler onSuccess que si la transaction est approuvée (approved/completed)
+          // — pas si elle est annulée, refusée, ou échouée.
+          const approved = transactionStatus
+            ? ["approved", "completed"].includes(transactionStatus.toLowerCase())
+            : !!transactionId; // si pas de statut, on se fie à la présence de l'id (ancien comportement)
+
+          if (transactionId && approved) {
             await onSuccess(transactionId);
+          } else if (transactionId && !approved) {
+            toast.error("Paiement non abouti. Réessayez si vous le souhaitez.");
           }
         } finally {
           setLoading(false);
@@ -89,6 +103,8 @@ export function FedaPayButton({
     widget.open();
   };
 
+  // Ouvrir le widget une seule fois au montage si autoOpen=true
+  // On ne réouvre JAMAIS automatiquement après un échec — l'utilisateur doit cliquer "Réessayer"
   useEffect(() => {
     if (!autoOpen || opened.current) return;
     let cancelled = false;
@@ -108,24 +124,19 @@ export function FedaPayButton({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (autoOpen && loading) {
-    return (
-      <>
-        <Script src="https://cdn.fedapay.com/checkout.js?v=1.1.7" strategy="afterInteractive" />
+  return (
+    <>
+      <Script src="https://cdn.fedapay.com/checkout.js?v=1.1.7" strategy="afterInteractive" />
+      {autoOpen && loading ? (
         <div className="flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground">
           <Loader2 size={16} className="animate-spin" />
           Ouverture du paiement...
         </div>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <Script src="https://cdn.fedapay.com/checkout.js?v=1.1.7" strategy="afterInteractive" />
-      <Button className="w-full" onClick={pay} disabled={disabled || loading}>
-        {loading ? "Traitement..." : autoOpen ? "Réessayer le paiement" : label}
-      </Button>
+      ) : (
+        <Button className="w-full" onClick={pay} disabled={disabled || loading}>
+          {loading ? "Traitement..." : autoOpen ? "Réessayer le paiement" : label}
+        </Button>
+      )}
     </>
   );
 }

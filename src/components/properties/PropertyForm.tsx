@@ -31,13 +31,11 @@ const schema = z.object({
   ville: z.string().min(2, "Ville requise"),
   pays: z.string().optional(),
   lien_maps: z.string().url("Lien invalide").optional().or(z.literal("")),
-  prix_loyer: z.number().positive("Prix invalide"),
-  devise: z.string().min(1),
+  prix_loyer: z.number().min(5000, "Le loyer doit être au moins 5 000 FCFA"),
   type_logement: z.string().min(1, "Type requis"),
   condition: z.string().min(1, "État du logement requis"),
   nb_avance: z.number().int().min(0),
-  caution_electricite: z.number().min(0),
-  caution_eau: z.number().min(0),
+  caution_mois: z.number().int().min(0),
   nb_pieces: z.number().int().min(1),
   eau_courante: z.boolean(),
   electricite: z.boolean(),
@@ -51,6 +49,14 @@ type FormValues = z.infer<typeof schema>;
 // v1 recentrée "logement étudiant" : uniquement "chambre à louer" pour l'instant.
 // Studio/maison/appartement/villa/duplex mis en standby, pas supprimés — réactiver ici si le scope s'élargit.
 const TYPES = ["chambre"];
+
+const VILLES_BENIN = [
+  "Cotonou", "Porto-Novo", "Parakou", "Abomey-Calavi", "Djougou",
+  "Bohicon", "Kandi", "Lokossa", "Ouidah", "Natitingou",
+  "Abomey", "Cové", "Dogbo", "Sakété", "Pobè",
+  "Comè", "Aplahoué", "Dassa-Zoumè", "Savè", "Nikki",
+  "Banikoara", "Malanville", "Tchaourou", "Péhunco",
+];
 // const TYPES_HORS_SCOPE_V1 = ["studio", "maison", "appartement", "villa", "duplex"];
 
 const CHECKBOXES: { key: keyof FormValues; label: string }[] = [
@@ -84,12 +90,10 @@ export function PropertyForm({ property }: { property?: Property }) {
           pays: property.pays ?? "",
           lien_maps: property.lien_maps ?? "",
           prix_loyer: property.prix_loyer,
-          devise: property.devise ?? "XOF",
           type_logement: property.type_logement,
           condition: property.condition ?? "",
           nb_avance: property.nb_avance,
-          caution_electricite: property.caution_electricite,
-          caution_eau: property.caution_eau,
+          caution_mois: property.caution_mois ?? 0,
           nb_pieces: property.nb_pieces,
           eau_courante: property.eau_courante,
           electricite: property.electricite,
@@ -98,12 +102,10 @@ export function PropertyForm({ property }: { property?: Property }) {
           meuble: property.meuble,
         }
       : {
-          devise: "XOF",
           type_logement: TYPES[0],
           nb_avance: 1,
           nb_pieces: 1,
-          caution_electricite: 0,
-          caution_eau: 0,
+          caution_mois: 0,
           eau_courante: false,
           electricite: false,
           gardien: false,
@@ -115,12 +117,13 @@ export function PropertyForm({ property }: { property?: Property }) {
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
     try {
+      const payload = { ...values, devise: "XOF" };
       if (property) {
-        await propertiesApi.update(property.id, values);
+        await propertiesApi.update(property.id, payload);
         toast.success("Annonce mise à jour.");
         router.push(`/owner/properties/${property.id}/edit`);
       } else {
-        const created = await propertiesApi.create(values);
+        const created = await propertiesApi.create(payload);
         toast.success("Annonce créée, ajoutez vos photos.");
         router.push(`/owner/properties/${created.id}/edit`);
       }
@@ -157,8 +160,17 @@ export function PropertyForm({ property }: { property?: Property }) {
         <h2 className="font-heading font-semibold">Localisation</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <div className="space-y-1.5">
-            <Label htmlFor="ville">Ville</Label>
-            <Input id="ville" {...register("ville")} />
+            <Label>Ville</Label>
+            <Select value={watch("ville")} onValueChange={(v) => setValue("ville", v ?? "")}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choisir une ville" />
+              </SelectTrigger>
+              <SelectContent>
+                {VILLES_BENIN.map((v) => (
+                  <SelectItem key={v} value={v}>{v}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FieldError message={errors.ville?.message} />
           </div>
           <div className="space-y-1.5">
@@ -181,13 +193,15 @@ export function PropertyForm({ property }: { property?: Property }) {
         <h2 className="font-heading font-semibold">Prix &amp; caractéristiques</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <div className="space-y-1.5">
-            <Label htmlFor="prix_loyer">Loyer mensuel</Label>
-            <Input id="prix_loyer" type="number" step="any" {...register("prix_loyer", { valueAsNumber: true })} />
+            <Label htmlFor="prix_loyer">Loyer mensuel (FCFA)</Label>
+            <Input id="prix_loyer" type="number" step="any" placeholder="Min. 5 000" {...register("prix_loyer", { valueAsNumber: true })} />
             <FieldError message={errors.prix_loyer?.message} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="devise">Devise</Label>
-            <Input id="devise" {...register("devise")} />
+            <Label>Devise</Label>
+            <div className="flex h-9 items-center rounded-md border border-input bg-muted px-3 text-sm text-muted-foreground">
+              XOF (Franc CFA)
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label>Type de logement</Label>
@@ -223,12 +237,9 @@ export function PropertyForm({ property }: { property?: Property }) {
             <Input id="nb_avance" type="number" {...register("nb_avance", { valueAsNumber: true })} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="caution_electricite">Caution électricité</Label>
-            <Input id="caution_electricite" type="number" step="any" {...register("caution_electricite", { valueAsNumber: true })} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="caution_eau">Caution eau</Label>
-            <Input id="caution_eau" type="number" step="any" {...register("caution_eau", { valueAsNumber: true })} />
+            <Label htmlFor="caution_mois">Caution (mois)</Label>
+            <Input id="caution_mois" type="number" min="0" {...register("caution_mois", { valueAsNumber: true })} />
+            <p className="text-xs text-muted-foreground">Exprimée en nombre de mois de loyer</p>
           </div>
         </div>
       </div>

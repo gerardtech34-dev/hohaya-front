@@ -13,8 +13,17 @@ import { CalendarX2 } from "lucide-react";
 const STATUS_STYLES: Record<string, string> = {
   en_attente: "border-accent/40 bg-accent/10 text-accent-foreground",
   confirmée: "border-secondary/40 bg-secondary/10 text-secondary",
+  reçue: "border-primary/40 bg-primary/10 text-primary",
   refusée: "border-destructive/40 bg-destructive/10 text-destructive",
   annulée: "border-border bg-muted text-muted-foreground",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  en_attente: "En attente",
+  confirmée: "Confirmée",
+  reçue: "Visite faite",
+  refusée: "Refusée",
+  annulée: "Annulée",
 };
 
 export default function OwnerVisitesPage() {
@@ -55,7 +64,7 @@ export default function OwnerVisitesPage() {
                   </p>
                 </div>
                 <Badge className={`capitalize ${STATUS_STYLES[v.status] ?? ""}`} variant="outline">
-                  {v.status}
+                  {STATUS_LABELS[v.status] ?? v.status}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">

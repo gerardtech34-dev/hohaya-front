@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, Phone, Mail, Copy, PhoneCall, Loader2, MapPin } from "lucide-react";
 import { WhatsAppIcon } from "@/components/icons/WhatsAppIcon";
@@ -35,11 +35,19 @@ export function UnlockContact({ propertyId, compact = false }: { propertyId: num
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
-  const [userFirst, ...userRest] = (user?.name ?? "").split(" ");
-  const [prenom, setPrenom] = useState(userFirst ?? "");
-  const [nom, setNom] = useState(userRest.join(" "));
-  const [email, setEmail] = useState(user?.email ?? "");
-  const [phone, setPhone] = useState(user?.phone ?? "");
+  const [prenom, setPrenom] = useState("");
+  const [nom, setNom] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    const [first, ...rest] = (user.name ?? "").split(" ");
+    setPrenom((p) => p || first || "");
+    setNom((n) => n || rest.join(" "));
+    setEmail((e) => e || user.email || "");
+    setPhone((ph) => ph || user.phone || "");
+  }, [user]);
 
   if (role === "owner" || role === "admin") return null;
 
