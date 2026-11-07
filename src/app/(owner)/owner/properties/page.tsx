@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -19,6 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const STATUSES = ["disponible", "loué", "suspendu"];
 
@@ -27,6 +35,7 @@ export default function OwnerPropertiesPage() {
   const { data, isLoading } = useQuery({ queryKey: ["my-properties"], queryFn: () => propertiesApi.myProperties() });
   const properties = data?.data ?? [];
   const confirm = useConfirmDialog();
+  const [pendingStatus, setPendingStatus] = useState<{ id: number; status: string; current: string } | null>(null);
 
   const remove = useMutation({
     mutationFn: propertiesApi.remove,
@@ -43,6 +52,7 @@ export default function OwnerPropertiesPage() {
     onSuccess: () => {
       toast.success("Statut mis à jour.");
       queryClient.invalidateQueries({ queryKey: ["my-properties"] });
+      setPendingStatus(null);
     },
     onError: () => toast.error("Impossible de changer le statut."),
   });
@@ -97,7 +107,7 @@ export default function OwnerPropertiesPage() {
 
                   <Select
                     value={p.status}
-                    onValueChange={(status) => status && changeStatus.mutate({ id: p.id, status })}
+                    onValueChange={(status) => status && status !== p.status && setPendingStatus({ id: p.id, status, current: p.status })}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />
@@ -151,6 +161,30 @@ export default function OwnerPropertiesPage() {
         loading={remove.isPending}
         onConfirm={() => confirm.target && remove.mutate(confirm.target)}
       />
+
+      <Dialog open={!!pendingStatus} onOpenChange={(open) => !open && setPendingStatus(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modifier le statut ?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Voulez-vous vraiment passer le statut de{" "}
+            <strong className="capitalize">{pendingStatus?.current}</strong> à{" "}
+            <strong className="capitalize">{pendingStatus?.status}</strong> ?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPendingStatus(null)}>
+              Annuler
+            </Button>
+            <Button
+              onClick={() => pendingStatus && changeStatus.mutate({ id: pendingStatus.id, status: pendingStatus.status })}
+              disabled={changeStatus.isPending}
+            >
+              {changeStatus.isPending ? "Mise à jour..." : "Confirmer"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

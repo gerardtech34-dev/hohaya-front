@@ -26,3 +26,7 @@ export function annulerVisite(id: number) {
 export function repondreVisite(id: number, status: "confirmée" | "refusée") {
   return apiFetch<Visite>(`/chercheur/visites/${id}/repondre`, { method: "PATCH", body: { status } });
 }
+
+export function marquerVisiteRecue(id: number) {
+  return apiFetch<Visite>(`/chercheur/visites/${id}/marquer-recue`, { method: "PATCH" });
+}

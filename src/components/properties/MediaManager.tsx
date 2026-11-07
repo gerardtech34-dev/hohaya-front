@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/ui/loading-state";
 import { ConfirmDialog, useConfirmDialog } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/utils";
-import { Trash2, Image as ImageIcon } from "lucide-react";
+import { Trash2, Image as ImageIcon, Play } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -40,11 +40,15 @@ const ZONES = [
   { value: "autre", label: "Autre" },
 ];
 
+const VIDEO_MAX_MB = 40;
+const VIDEO_MAX_BYTES = VIDEO_MAX_MB * 1024 * 1024;
+
 export function MediaManager({ propertyId }: { propertyId: number }) {
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [zone, setZone] = useState("salon");
+  const isVideo = pendingFile?.type.startsWith("video") ?? false;
   const { data, isLoading } = useQuery({
     queryKey: ["property-medias", propertyId],
     queryFn: () => mediaApi.list(propertyId),
@@ -103,8 +107,15 @@ export function MediaManager({ propertyId }: { propertyId: number }) {
     moveMedia.mutate(order);
   };
 
+  const hasImage = medias.some((m) => m.type === "image");
+
   return (
     <div className="space-y-4 rounded-2xl border border-border bg-card p-5">
+      {!isLoading && !hasImage && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-200">
+          ⚠️ Votre annonce n&apos;est pas encore visible. Ajoutez au moins une photo pour la publier.
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <h2 className="font-heading font-semibold">Photos &amp; vidéos</h2>
         <Button size="sm" onClick={() => fileRef.current?.click()}>
@@ -117,7 +128,13 @@ export function MediaManager({ propertyId }: { propertyId: number }) {
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) setPendingFile(file);
+            if (!file) return;
+            if (file.type.startsWith("video") && file.size > VIDEO_MAX_BYTES) {
+              toast.error(`La vidéo dépasse la taille maximale autorisée (${VIDEO_MAX_MB} Mo). Veuillez en choisir une plus légère.`);
+              e.target.value = "";
+              return;
+            }
+            setPendingFile(file);
             e.target.value = "";
           }}
         />
@@ -130,6 +147,11 @@ export function MediaManager({ propertyId }: { propertyId: number }) {
           </DialogHeader>
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">{pendingFile?.name}</p>
+            {isVideo && (
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-800/40 dark:bg-blue-900/20 dark:text-blue-200">
+                📹 Taille maximale : <strong>{VIDEO_MAX_MB} Mo</strong>. Formats acceptés : MP4, MOV, WebM. La vidéo sera lisible par les visiteurs dans le détail de l&apos;annonce.
+              </div>
+            )}
             <Select value={zone} onValueChange={(v) => setZone(v ?? "salon")}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Zone" />
@@ -169,7 +191,12 @@ export function MediaManager({ propertyId }: { propertyId: number }) {
                 )}
               >
                 {m.type === "video" ? (
-                  <video src={m.url} className="h-full w-full object-cover" />
+                  <div className="relative h-full w-full bg-black">
+                    <video src={m.url} className="h-full w-full object-cover" preload="metadata" />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <Play size={20} className="fill-white text-white" />
+                    </span>
+                  </div>
                 ) : (
                   <Image src={m.url} alt="" fill className="object-cover" unoptimized />
                 )}

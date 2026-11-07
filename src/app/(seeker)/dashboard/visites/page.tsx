@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CalendarX2 } from "lucide-react";
-import { annulerVisite, mesVisites, repondreVisite } from "@/lib/api/chercheur";
+import { annulerVisite, marquerVisiteRecue, mesVisites, repondreVisite } from "@/lib/api/chercheur";
 import type { Visite } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 const STATUS_STYLES: Record<string, string> = {
   en_attente: "border-accent/40 bg-accent/10 text-accent-foreground",
   confirmée: "border-secondary/40 bg-secondary/10 text-secondary",
+  reçue: "border-primary/40 bg-primary/10 text-primary",
   refusée: "border-destructive/40 bg-destructive/10 text-destructive",
   annulée: "border-border bg-muted text-muted-foreground",
 };
@@ -29,6 +30,7 @@ const STATUS_STYLES: Record<string, string> = {
 const STATUS_LABELS: Record<string, string> = {
   en_attente: "En attente",
   confirmée: "Confirmée",
+  reçue: "Visite faite",
   refusée: "Refusée",
   annulée: "Annulée",
 };
@@ -56,6 +58,15 @@ export default function VisitesPage() {
       queryClient.invalidateQueries({ queryKey: ["visites"] });
     },
     onError: () => toast.error("Impossible d'envoyer la réponse."),
+  });
+
+  const markDone = useMutation({
+    mutationFn: (id: number) => marquerVisiteRecue(id),
+    onSuccess: () => {
+      toast.success("Visite marquée comme effectuée !");
+      queryClient.invalidateQueries({ queryKey: ["visites"] });
+    },
+    onError: () => toast.error("Impossible de marquer cette visite."),
   });
 
   return (
@@ -109,6 +120,19 @@ export default function VisitesPage() {
                       disabled={respond.isPending}
                     >
                       Refuser
+                    </Button>
+                  </>
+                ) : v.status === "confirmée" ? (
+                  <>
+                    <Button
+                      size="sm"
+                      onClick={() => markDone.mutate(v.id)}
+                      disabled={markDone.isPending}
+                    >
+                      J&apos;ai visité
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setToCancel(v)}>
+                      Annuler
                     </Button>
                   </>
                 ) : (

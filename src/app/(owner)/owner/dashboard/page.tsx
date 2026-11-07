@@ -3,21 +3,18 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, CalendarCheck, CreditCard, Wallet, Home, PlusCircle, UserCog, ArrowRight } from "lucide-react";
+import { Building2, CalendarCheck, Wallet, Home, PlusCircle, UserCog, ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import * as propertiesApi from "@/lib/api/properties";
-import * as abonnementsApi from "@/lib/api/abonnements";
 import * as ownerVisitesApi from "@/lib/api/owner-visites";
 import { formatPrix } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ButtonLink } from "@/components/ui/button-link";
 import { LoadingState } from "@/components/ui/loading-state";
 
 export default function OwnerDashboardPage() {
   const { user } = useAuth();
   const properties = useQuery({ queryKey: ["my-properties"], queryFn: () => propertiesApi.myProperties() });
-  const abonnement = useQuery({ queryKey: ["abonnement-actif"], queryFn: abonnementsApi.actif });
   const visites = useQuery({ queryKey: ["visites-recues"], queryFn: ownerVisitesApi.visitesRecues });
 
   const actives = properties.data?.data.filter((p) => p.status === "disponible").length ?? 0;
@@ -27,12 +24,6 @@ export default function OwnerDashboardPage() {
   const STATS = [
     { icon: Building2, label: "Annonces actives", value: actives, href: "/owner/properties" },
     { icon: CalendarCheck, label: "Visites en attente", value: enAttente, href: "/owner/visites" },
-    {
-      icon: CreditCard,
-      label: "Abonnement",
-      value: abonnement.data ? abonnement.data.type_label : "Inactif",
-      href: "/owner/abonnement",
-    },
     { icon: Wallet, label: "Total annonces", value: total, href: "/owner/properties" },
   ];
 
@@ -45,19 +36,7 @@ export default function OwnerDashboardPage() {
         <p className="text-sm text-muted-foreground">Voici un aperçu de votre activité sur Hohaya.</p>
       </div>
 
-      {!abonnement.isLoading && !abonnement.data && (
-        <Alert>
-          <AlertTitle>Aucun abonnement actif</AlertTitle>
-          <AlertDescription>
-            Souscrivez à un abonnement pour publier vos annonces.{" "}
-            <Link href="/owner/abonnement" className="underline">
-              Voir les tarifs
-            </Link>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+<div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {STATS.map((stat) => (
           <Link key={stat.label} href={stat.href}>
             <Card className="transition hover:border-primary hover:shadow-sm">

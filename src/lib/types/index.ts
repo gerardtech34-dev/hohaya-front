@@ -46,6 +46,7 @@ export type Property = {
   nb_avance: number;
   caution_electricite: number;
   caution_eau: number;
+  caution_mois: number;
   nb_pieces: number;
   status: string;
   date_debut_louer: string | null;
